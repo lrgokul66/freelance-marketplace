@@ -17,8 +17,14 @@ def get_db():
     """
     if 'db' not in g:
         try:
+            # Enable SSL automatically if explicitly configured or using a remote database host
+            ssl_config = None
+            db_host = current_app.config['MYSQL_HOST']
+            if current_app.config.get('MYSQL_SSL') or (db_host not in ('localhost', '127.0.0.1')):
+                ssl_config = {'ssl': {}}
+
             g.db = pymysql.connect(
-                host=current_app.config['MYSQL_HOST'],
+                host=db_host,
                 port=current_app.config['MYSQL_PORT'],
                 user=current_app.config['MYSQL_USER'],
                 password=current_app.config['MYSQL_PASSWORD'],
@@ -26,6 +32,7 @@ def get_db():
                 charset='utf8mb4',
                 cursorclass=pymysql.cursors.DictCursor,
                 autocommit=False,
+                ssl=ssl_config,
                 init_command=(
                     "SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,"
                     "NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'"

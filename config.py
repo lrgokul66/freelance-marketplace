@@ -20,6 +20,8 @@ class Config:
     MYSQL_USER = os.environ.get('MYSQL_USER', 'root')
     MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'root')
     MYSQL_DB = os.environ.get('MYSQL_DB', 'freelance_marketplace')
+    MYSQL_SSL = os.environ.get('MYSQL_SSL', 'False') == 'True'
+
 
     # File Upload Configuration
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  # 16 MB
