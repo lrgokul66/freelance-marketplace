@@ -3,6 +3,7 @@ Configuration module for the Freelance Marketplace application.
 Loads settings from .env file and provides different config classes.
 """
 import os
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 load_dotenv()

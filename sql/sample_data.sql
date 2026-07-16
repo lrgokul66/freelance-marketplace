@@ -1,3 +1,4 @@
+
 -- ============================================================
 -- FreelanceHub Sample Data
 -- All passwords are: Password123!
