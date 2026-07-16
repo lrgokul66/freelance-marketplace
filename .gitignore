@@ -64,3 +64,5 @@ logs/
 uploads/*
 !uploads/.gitkeep
 sql/db_dump.*
+init_aiven_db.py
+

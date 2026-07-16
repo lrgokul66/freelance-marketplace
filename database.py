@@ -21,7 +21,10 @@ def get_db():
             ssl_config = None
             db_host = current_app.config['MYSQL_HOST']
             if current_app.config.get('MYSQL_SSL') or (db_host not in ('localhost', '127.0.0.1')):
-                ssl_config = {'ssl': {}}
+                import ssl
+                ssl_config = ssl.create_default_context()
+                ssl_config.check_hostname = False
+                ssl_config.verify_mode = ssl.CERT_NONE
 
             g.db = pymysql.connect(
                 host=db_host,
