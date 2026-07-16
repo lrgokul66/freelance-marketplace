@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Post a Project — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('client.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="{{ url_for('client.my_projects') }}"><i class="bi bi-folder2-open"></i> My Projects</a>
+    <a class="nav-link active" href="{{ url_for('client.create_project') }}"><i class="bi bi-plus-circle"></i> Post
+        Project</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="page-header">
+            <h1 class="page-title">Post a New Project</h1>
+        </div>
+        <div class="card p-4">
+            <form method="POST" enctype="multipart/form-data" data-loading>
+                <div class="mb-3">
+                    <label class="form-label">Project Title <span class="text-danger">*</span></label>
+                    <input type="text" name="title" class="form-control" required
+                        placeholder="e.g. Build a React e-commerce website"
+                        value="{{ project.title if project else '' }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                    <textarea name="description" class="form-control" rows="6" required
+                        placeholder="Describe your project in detail: goals, requirements, deliverables…">{{ project.description if project else '' }}</textarea>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Category <span class="text-danger">*</span></label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select category…</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat }}" {{ 'selected' if project and project.category==cat }}>{{ cat }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Experience Level</label>
+                        <select name="experience_level" class="form-select">
+                            <option value="">Any level</option>
+                            {% for lvl in ['entry','intermediate','expert'] %}
+                            <option value="{{ lvl }}" {{ 'selected' if project and project.experience_level==lvl }}>{{
+                                lvl | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Min Budget (₹) <span class="text-danger">*</span></label>
+                        <input type="number" name="budget_min" class="form-control" required min="1"
+                            value="{{ project.budget_min if project else '' }}" placeholder="500">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Max Budget (₹) <span class="text-danger">*</span></label>
+                        <input type="number" name="budget_max" class="form-control" required min="1"
+                            value="{{ project.budget_max if project else '' }}" placeholder="5000">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Duration</label>
+                        <select name="duration" class="form-select">
+                            <option value="">Not specified</option>
+                            <option value="less_week" {{ 'selected' if project and project.duration=='less_week' }}>Less
+                                than a week</option>
+                            <option value="week_month" {{ 'selected' if project and project.duration=='week_month' }}>1
+                                week – 1 month</option>
+                            <option value="one_three_months" {{ 'selected' if project and
+                                project.duration=='one_three_months' }}>1–3 months</option>
+                            <option value="over_three_months" {{ 'selected' if project and
+                                project.duration=='over_three_months' }}>3+ months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Required Skills</label>
+                    <select name="skills" class="form-select" multiple style="height:120px;">
+                        {% for sk in all_skills %}
+                        <option value="{{ sk.id }}" {{ 'selected' if current_skill_ids and sk.id in current_skill_ids
+                            }}>
+                            {{ sk.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Hold Ctrl/Cmd to select multiple.</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Attachments <span class="text-muted small">(optional)</span></label>
+                    <input type="file" name="files" class="form-control" multiple>
+                </div>
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary flex-fill py-2 fw-600">
+                        <i class="bi bi-cloud-upload me-2"></i>{{ 'Update Project' if project else 'Post Project' }}
+                    </button>
+                    <a href="{{ url_for('client.my_projects') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

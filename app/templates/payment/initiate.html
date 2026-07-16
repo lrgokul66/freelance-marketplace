@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Make Payment — FreelanceHub{% endblock %}
+{% block extra_css %}
+<style>
+    .rzp-btn {
+        background: #528FF0;
+        color: #fff;
+        border: none;
+        padding: .75rem 2rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .rzp-btn:hover {
+        background: #3a73d8;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card p-4 fade-in-up">
+            <div class="text-center mb-4">
+                <i class="bi bi-credit-card-fill fs-1 text-primary"></i>
+                <h2 class="fw-800 mt-2 mb-0">Make Payment</h2>
+                <p class="text-muted small">For: <strong>{{ project.title }}</strong></p>
+            </div>
+
+            <!-- Summary -->
+            <div class="card p-3 mb-4" style="background:var(--bg-input);">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Freelancer</span>
+                    <span class="fw-600">{{ freelancer.first_name }} {{ freelancer.last_name }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Project Budget</span>
+                    <span>₹{{ project.budget_min }} – ₹{{ project.budget_max }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Agreed Amount</span>
+                    <span class="fw-700 fs-5 text-success">₹{{ amount }}</span>
+                </div>
+            </div>
+
+            <!-- Amount input -->
+            <div class="mb-4">
+                <label class="form-label">Payment Amount (₹) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" id="paymentAmount" class="form-control" value="{{ amount }}" min="1">
+                </div>
+            </div>
+
+            <button id="rzp-trigger-btn" class="rzp-btn w-100">
+                <i class="bi bi-shield-check me-2"></i>Pay Securely via Razorpay
+            </button>
+            <p class="text-muted text-center x-small mt-2">
+                <i class="bi bi-lock me-1"></i>Secured by Razorpay. Your payment details are encrypted.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden forms for POST -->
+<form id="rzpSuccessForm" method="POST" action="{{ url_for('payment.verify') }}" class="d-none">
+    <input type="hidden" name="razorpay_payment_id" id="rzp_payment_id">
+    <input type="hidden" name="razorpay_order_id" id="rzp_order_id">
+    <input type="hidden" name="razorpay_signature" id="rzp_signature">
+    <input type="hidden" name="payment_db_id" id="rzp_payment_db_id">
+    <input type="hidden" name="project_id" value="{{ project.id }}">
+</form>
+{% endblock %}
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-trigger-btn').addEventListener('click', async function () {
+        const amount = document.getElementById('paymentAmount').value;
+        if (!amount || amount < 1) { alert('Enter a valid amount.'); return; }
+        const btn = this;
+        btn.disabled = true; btn.textContent = 'Please wait…';
+
+        const resp = await fetch("{{ url_for('payment.create_order') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: {{ project.id }}, amount: parseInt(amount) })
+  });
+    const data = await resp.json();
+    if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = '⚡ Pay Securely'; return; }
+
+    const opts = {
+        key: "{{ razorpay_key_id }}",
+        amount: data.amount,
+        currency: "INR",
+        order_id: data.order_id,
+        name: "FreelanceHub",
+        description: "{{ project.title | truncate(40) }}",
+        handler: function (response) {
+            document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+            document.getElementById('rzp_signature').value = response.razorpay_signature;
+            document.getElementById('rzp_payment_db_id').value = data.payment_db_id;
+            document.getElementById('rzpSuccessForm').submit();
+        },
+        prefill: { name: "{{ session.get('full_name','') }}", email: "{{ session.get('email','') }}" },
+        theme: { color: "#6366f1" }
+    };
+    (new Razorpay(opts)).open();
+    btn.disabled = false; btn.textContent = '⚡ Pay Securely via Razorpay';
+});
+</script>
+{% endblock %}

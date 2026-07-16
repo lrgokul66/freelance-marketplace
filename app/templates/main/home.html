@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}FreelanceHub — Connect, Create, Succeed{% endblock %}
+{% block body %}
+
+<!-- ── Hero ───────────────────────────────────────────────── -->
+<section class="hero text-center">
+    <div class="container py-2">
+        <h1 class="fw-800 mb-3">Find Expert Freelancers<br>or Land Your Next Project</h1>
+        <p class="lead mb-5 opacity-90">Thousands of skilled professionals ready to help you build, design, write, and
+            more.</p>
+        <form action="{{ url_for('projects.list_projects') }}" method="GET"
+            class="d-flex gap-2 justify-content-center flex-wrap">
+            <input type="text" name="q" placeholder="Try 'Python developer', 'Logo design'…"
+                class="form-control rounded-pill px-4" style="max-width:460px;height:52px;">
+            <button type="submit" class="btn btn-light fw-700 px-4 rounded-pill"
+                style="height:52px;color:var(--primary);">
+                <i class="bi bi-search me-2"></i>Search
+            </button>
+        </form>
+        <div class="mt-4 opacity-80 small">
+            Popular: <a href="{{ url_for('projects.list_projects') }}?category=Web+Development"
+                class="text-white me-2">Web Dev</a>
+            <a href="{{ url_for('projects.list_projects') }}?category=Design" class="text-white me-2">Design</a>
+            <a href="{{ url_for('projects.list_projects') }}?category=Writing" class="text-white me-2">Writing</a>
+            <a href="{{ url_for('projects.list_projects') }}?category=Data+Science" class="text-white">Data Science</a>
+        </div>
+    </div>
+</section>
+
+<!-- ── How It Works ───────────────────────────────────────── -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-800 mb-5">How It Works</h2>
+        <div class="row g-4 text-center">
+            {% for step in [
+            ('bi-pencil-square', 'Post a Project', 'Describe your project, set your budget, and publish in minutes.'),
+            ('bi-people-fill', 'Receive Proposals', 'Freelancers submit proposals with bids, timelines, and
+            portfolios.'),
+            ('bi-person-check-fill', 'Hire & Collaborate', 'Select the best fit, chat privately, and track progress.'),
+            ('bi-shield-check', 'Pay Securely', 'Safe Razorpay escrow — release payment when work is approved.'),
+            ] %}
+            <div class="col-md-3 fade-in-up">
+                <div class="card p-4 h-100">
+                    <div class="stat-icon mx-auto mb-3 stat-primary" style="width:60px;height:60px;font-size:1.5rem;">
+                        <i class="bi {{ step[0] }}"></i>
+                    </div>
+                    <h5 class="fw-700">{{ step[1] }}</h5>
+                    <p class="text-muted small mb-0">{{ step[2] }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ── Latest Projects ────────────────────────────────────── -->
+{% if latest_projects %}
+<section class="py-4" style="background:var(--bg-input);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-800 mb-0">Latest Projects</h2>
+            <a href="{{ url_for('projects.list_projects') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        <div class="row g-3">
+            {% for p in latest_projects[:6] %}
+            <div class="col-md-4 fade-in-up">
+                <a href="{{ url_for('projects.detail', project_id=p.id) }}" class="text-decoration-none">
+                    <div class="card project-card h-100 p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="skill-tag">{{ p.category }}</span>
+                            <span class="budget-badge">₹{{ p.budget_min }}–{{ p.budget_max }}</span>
+                        </div>
+                        <h6 class="fw-700 mb-1 text-body">{{ p.title | truncate(55) }}</h6>
+                        <p class="text-muted small mb-2">{{ p.description | truncate(80) }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <span class="badge badge-status-{{ p.status }}">{{ p.status | title }}</span>
+                            <span class="text-muted small"><i class="bi bi-file-earmark-text me-1"></i>{{
+                                p.proposal_count }} proposals</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── Top Freelancers ─────────────────────────────────────── -->
+{% if top_freelancers %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-800 mb-0">Top Freelancers</h2>
+            <a href="{{ url_for('main.search_freelancers') }}" class="btn btn-outline-primary">Find Talent</a>
+        </div>
+        <div class="row g-3">
+            {% for f in top_freelancers[:4] %}
+            <div class="col-md-3 fade-in-up">
+                <a href="{{ url_for('main.freelancer_profile', username=f.username) }}" class="text-decoration-none">
+                    <div class="card freelancer-card p-3 h-100">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="avatar-placeholder" style="width:48px;height:48px;flex-shrink:0;">
+                                {{ f.first_name[0] | upper }}{{ f.last_name[0] | upper }}
+                            </div>
+                            <div>
+                                <div class="fw-700 text-body">{{ f.first_name }} {{ f.last_name }}</div>
+                                <div class="text-muted small">{{ f.headline | truncate(28) }}</div>
+                            </div>
+                        </div>
+                        <div class="rating small mb-2">
+                            {% for i in range(f.avg_rating | int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            <span class="text-muted ms-1">{{ "%.1f" | format(f.avg_rating) }} ({{ f.review_count
+                                }})</span>
+                        </div>
+                        <div class="text-muted small">₹{{ f.hourly_rate }}/hr</div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ── CTA ────────────────────────────────────────────────── -->
+<section class="py-5" style="background:linear-gradient(135deg,#6366f1,#10b981);color:#fff;">
+    <div class="container text-center">
+        <h2 class="fw-800 mb-3">Ready to get started?</h2>
+        <p class="opacity-90 mb-4">Join thousands of clients and freelancers on FreelanceHub.</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light fw-700 px-5 py-2 rounded-pill"
+            style="color:var(--primary);">Sign Up Free</a>
+    </div>
+</section>
+{% endblock %}

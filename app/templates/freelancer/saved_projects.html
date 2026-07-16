@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Saved Projects — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('freelancer.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="{{ url_for('freelancer.browse_projects') }}"><i class="bi bi-search"></i> Find
+        Projects</a>
+    <a class="nav-link" href="{{ url_for('freelancer.my_proposals') }}"><i class="bi bi-file-earmark-text"></i> My
+        Proposals</a>
+    <a class="nav-link active" href="{{ url_for('freelancer.saved_projects') }}"><i class="bi bi-bookmark"></i>
+        Saved</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-bookmark-fill text-primary me-2"></i>Saved Projects</h1>
+</div>
+{% if projects %}
+<div class="row g-3">
+    {% for p in projects %}
+    <div class="col-md-6 col-xl-4 fade-in-up">
+        <div class="card project-card h-100 p-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="skill-tag">{{ p.category }}</span>
+                <span class="budget-badge">₹{{ p.budget_min }}–{{ p.budget_max }}</span>
+            </div>
+            <h6 class="fw-700 mb-1">
+                <a href="{{ url_for('projects.detail', project_id=p.id) }}" class="text-body text-decoration-none">
+                    {{ p.title | truncate(55) }}
+                </a>
+            </h6>
+            <p class="text-muted small mb-2">{{ p.description | truncate(80) }}</p>
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+                <span class="badge badge-status-{{ p.status }}">{{ p.status | title }}</span>
+                <div class="d-flex gap-1">
+                    {% if p.status in ('open','hiring') %}
+                    <a href="{{ url_for('proposals.submit', project_id=p.id) }}" class="btn btn-sm btn-primary"
+                        style="font-size:.75rem;padding:.2rem .6rem;">Bid</a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('freelancer.toggle_save_project', project_id=p.id) }}">
+                        <button class="btn btn-sm btn-outline-danger" title="Remove"
+                            style="font-size:.75rem;padding:.2rem .5rem;">
+                            <i class="bi bi-bookmark-x"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card p-5 text-center text-muted">
+    <i class="bi bi-bookmark fs-1 d-block mb-3"></i>
+    <h5>No saved projects yet.</h5>
+    <a href="{{ url_for('freelancer.browse_projects') }}" class="btn btn-primary mt-2">Browse Projects</a>
+</div>
+{% endif %}
+{% endblock %}

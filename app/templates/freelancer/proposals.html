@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}My Proposals — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('freelancer.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="{{ url_for('freelancer.browse_projects') }}"><i class="bi bi-search"></i> Find
+        Projects</a>
+    <a class="nav-link active" href="{{ url_for('freelancer.my_proposals') }}"><i class="bi bi-file-earmark-text"></i>
+        My Proposals</a>
+    <a class="nav-link" href="{{ url_for('freelancer.saved_projects') }}"><i class="bi bi-bookmark"></i> Saved</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">My Proposals</h1>
+    <p class="page-subtitle">{{ proposals | length }} total</p>
+</div>
+<div class="card">
+    {% if proposals %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Bid</th>
+                    <th>Delivery</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in proposals %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('projects.detail', project_id=p.project_id) }}"
+                            class="fw-600 text-body text-decoration-none">
+                            {{ p.project_title | truncate(45) }}
+                        </a>
+                        <div class="text-muted x-small">{{ p.project_category }}</div>
+                    </td>
+                    <td class="fw-600">₹{{ p.bid_amount }}</td>
+                    <td class="small">{{ p.delivery_days }} days</td>
+                    <td><span class="badge badge-status-{{ p.status }}">{{ p.status | title }}</span></td>
+                    <td class="small text-muted">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('proposals.view', proposal_id=p.id) }}"
+                                class="btn btn-sm btn-outline-primary">View</a>
+                            {% if p.status == 'pending' %}
+                            <a href="{{ url_for('proposals.edit', proposal_id=p.id) }}"
+                                class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <form method="POST" action="{{ url_for('proposals.withdraw', proposal_id=p.id) }}"
+                                onsubmit="return confirm('Withdraw this proposal?')">
+                                <button class="btn btn-sm btn-outline-danger">Withdraw</button>
+                            </form>
+                            {% endif %}
+                            {% if p.status == 'accepted' %}
+                            <a href="{{ url_for('chat.conversation', project_id=p.project_id, other_user_id=p.client_id) }}"
+                                class="btn btn-sm btn-primary">Chat</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+        <h5>No proposals yet.</h5>
+        <a href="{{ url_for('freelancer.browse_projects') }}" class="btn btn-primary mt-2">Find Projects</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

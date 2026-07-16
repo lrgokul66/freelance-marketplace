@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Freelancer Dashboard — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link active" href="{{ url_for('freelancer.dashboard') }}"><i class="bi bi-speedometer2"></i>
+        Dashboard</a>
+    <a class="nav-link" href="{{ url_for('freelancer.browse_projects') }}"><i class="bi bi-search"></i> Browse
+        Projects</a>
+    <a class="nav-link" href="{{ url_for('freelancer.my_proposals') }}"><i class="bi bi-file-earmark-text"></i> My
+        Proposals</a>
+    <a class="nav-link" href="{{ url_for('freelancer.saved_projects') }}"><i class="bi bi-bookmark"></i> Saved
+        Projects</a>
+    <div class="sidebar-label">Account</div>
+    <a class="nav-link" href="{{ url_for('freelancer.profile') }}"><i class="bi bi-person-circle"></i> Profile</a>
+    <a class="nav-link" href="{{ url_for('freelancer.edit_profile') }}"><i class="bi bi-gear"></i> Settings</a>
+    <a class="nav-link" href="{{ url_for('chat.inbox') }}"><i class="bi bi-chat-dots"></i> Messages</a>
+    <a class="nav-link" href="{{ url_for('notifications.list_notifications') }}"><i class="bi bi-bell"></i>
+        Notifications</a>
+    <a class="nav-link" href="{{ url_for('payment.history') }}"><i class="bi bi-credit-card"></i> Earnings</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Welcome, {{ session.first_name }}! 👋</h1>
+        <p class="page-subtitle">Your freelancer overview</p>
+    </div>
+    <a href="{{ url_for('freelancer.browse_projects') }}" class="btn btn-primary">
+        <i class="bi bi-search me-2"></i>Browse Projects
+    </a>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="stat-card stat-primary">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-grid-3x3-gap"></i></div>
+                <div class="stat-label">Available Projects</div>
+            </div>
+            <div class="stat-value">{{ available_projects | length }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card stat-warning">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="stat-label">Proposals Sent</div>
+            </div>
+            <div class="stat-value">{{ total_proposals }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card stat-success">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            <div class="stat-value">{{ accepted_count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card stat-info">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-trophy"></i></div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-value">{{ completed_count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-currency-rupee"></i>
+                </div>
+                <div class="stat-label">Total Earned</div>
+            </div>
+            <div class="stat-value">₹{{ "%.0f" | format(total_earnings) }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;">
+            <div class="stat-left">
+                <div class="stat-icon" style="background:rgba(255,255,255,.2)"><i class="bi bi-star-fill"></i></div>
+                <div class="stat-label">Rating</div>
+            </div>
+            <div class="stat-value">{{ rating_info.avg_rating or '–' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- My Proposals -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-file-earmark-text me-2"></i>Recent Proposals</span>
+                <a href="{{ url_for('freelancer.my_proposals') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            {% if proposals %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Bid</th>
+                            <th>Days</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in proposals %}
+                        <tr>
+                            <td class="fw-600 small">{{ p.project_title | truncate(30) }}</td>
+                            <td>₹{{ p.bid_amount }}</td>
+                            <td>{{ p.delivery_days }}d</td>
+                            <td>
+                                <span class="badge badge-status-{{ p.status }}">
+                                    {{ p.status | title }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card-body text-center py-5 text-muted">
+                <i class="bi bi-file-earmark-plus fs-1 d-block mb-2"></i>
+                No proposals yet.
+                <a href="{{ url_for('freelancer.browse_projects') }}" class="d-block mt-2">Browse projects →</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Available Projects -->
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-grid-3x3-gap me-2"></i>Latest Projects</span>
+                <a href="{{ url_for('freelancer.browse_projects') }}" class="btn btn-sm btn-outline-primary">Browse</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for p in available_projects %}
+                <li class="list-group-item" style="background:transparent;border-color:var(--border);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <a href="{{ url_for('projects.detail', project_id=p.id) }}" class="fw-600 small d-block">{{
+                                p.title | truncate(32) }}</a>
+                            <span class="badge badge-status-open small">{{ p.category }}</span>
+                        </div>
+                        <span class="text-success small fw-700">₹{{ p.budget_min }}–{{ p.budget_max }}</span>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center text-muted py-4" style="background:transparent;">
+                    <i class="bi bi-folder-x fs-2 d-block mb-1"></i>No open projects
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

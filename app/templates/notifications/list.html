@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Notifications — FreelanceHub{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-bell-fill text-primary me-2"></i>Notifications</h1>
+    {% if notifications %}
+    <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+        <button class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-check2-all me-1"></i>Mark All Read
+        </button>
+    </form>
+    {% endif %}
+</div>
+<div class="card">
+    {% if notifications %}
+    <ul class="list-group list-group-flush">
+        {% for n in notifications %}
+        <li class="list-group-item d-flex align-items-start gap-3 py-3
+               {{ '' if n.is_read else 'fw-600' }}" style="background:{{ 'rgba(99,102,241,.05)' if not n.is_read else 'transparent' }};
+               border-color:var(--border);">
+            <div class="mt-1">
+                {% if n.type == 'new_proposal' %}
+                <i class="bi bi-file-earmark-text-fill text-primary fs-5"></i>
+                {% elif n.type == 'payment_success' %}
+                <i class="bi bi-credit-card-fill text-success fs-5"></i>
+                {% elif n.type == 'new_message' %}
+                <i class="bi bi-chat-dots-fill text-info fs-5"></i>
+                {% elif n.type == 'work_submitted' %}
+                <i class="bi bi-upload text-warning fs-5"></i>
+                {% elif n.type == 'work_reviewed' %}
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                {% elif n.type == 'rating_received' %}
+                <i class="bi bi-star-fill text-warning fs-5"></i>
+                {% else %}
+                <i class="bi bi-bell-fill text-secondary fs-5"></i>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <div>{{ n.title }}</div>
+                <div class="text-muted small">{{ n.message }}</div>
+                <div class="text-muted x-small mt-1">{{ n.created_at.strftime('%b %d, %Y %H:%M') }}</div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                {% if n.link %}
+                <a href="{{ n.link }}" class="btn btn-sm btn-outline-primary">View</a>
+                {% endif %}
+                {% if not n.is_read %}
+                <form method="POST" action="{{ url_for('notifications.mark_read', notification_id=n.id) }}">
+                    <button class="btn btn-sm btn-outline-secondary" title="Mark as read">
+                        <i class="bi bi-check2"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-bell-slash fs-1 d-block mb-3"></i>
+        <h5>No notifications yet</h5>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

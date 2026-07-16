@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('freelancer.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="{{ url_for('freelancer.profile') }}"><i class="bi bi-person-circle"></i> Profile</a>
+    <a class="nav-link active" href="{{ url_for('freelancer.edit_profile') }}"><i class="bi bi-gear"></i> Settings</a>
+    <hr style="border-color:var(--border)">
+    <a class="nav-link text-danger" href="{{ url_for('auth.delete_account') }}"><i class="bi bi-trash"></i> Delete
+        Account</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="page-title mb-4">Edit Profile &amp; Settings</h1>
+
+        <!-- Basic Info -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Basic Information</div>
+            <form method="POST" data-loading>
+                <input type="hidden" name="section" value="basic">
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control" required
+                            value="{{ profile.first_name }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" required
+                            value="{{ profile.last_name }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Professional Headline</label>
+                    <input type="text" name="headline" class="form-control" value="{{ profile.headline or '' }}"
+                        placeholder="e.g. Full-Stack Python Developer">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bio</label>
+                    <textarea name="bio" class="form-control" rows="4"
+                        placeholder="Tell clients about your expertise…">{{ profile.bio or '' }}</textarea>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Hourly Rate (₹/hr)</label>
+                        <input type="number" name="hourly_rate" class="form-control" min="1"
+                            value="{{ profile.hourly_rate or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Location</label>
+                        <input type="text" name="location" class="form-control" value="{{ profile.location or '' }}"
+                            placeholder="City, Country">
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Years of Experience</label>
+                        <input type="number" name="experience_years" class="form-control" min="0"
+                            value="{{ profile.experience_years or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Availability</label>
+                        <select name="availability" class="form-select">
+                            <option value="full_time" {{ 'selected' if profile.availability=='full_time' }}>Full-Time
+                            </option>
+                            <option value="part_time" {{ 'selected' if profile.availability=='part_time' }}>Part-Time
+                            </option>
+                            <option value="weekends" {{ 'selected' if profile.availability=='weekends' }}>Weekends
+                            </option>
+                            <option value="not_available" {{ 'selected' if profile.availability=='not_available' }}>Not
+                                Available</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Skills</label>
+                    <select name="skills" class="form-select" multiple style="height:120px;">
+                        {% for sk in all_skills %}
+                        <option value="{{ sk.id }}" {{ 'selected' if sk.id in current_skill_ids }}>{{ sk.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Ctrl/Cmd + click to select multiple.</div>
+                </div>
+                <button type="submit" class="btn btn-primary fw-600">
+                    <i class="bi bi-check-circle me-1"></i>Save
+                </button>
+            </form>
+        </div>
+
+        <!-- Portfolio -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Portfolio Items</div>
+            {% if portfolio %}
+            <ul class="list-group list-group-flush mb-3">
+                {% for item in portfolio %}
+                <li class="list-group-item d-flex justify-content-between"
+                    style="background:transparent;border-color:var(--border);">
+                    <div>
+                        <div class="fw-600">{{ item.title }}</div>
+                        <div class="text-muted small">{{ item.description | truncate(60) }}</div>
+                        {% if item.link %}<a href="{{ item.link }}" class="small" target="_blank">{{ item.link |
+                            truncate(40) }}</a>{% endif %}
+                    </div>
+                    <form method="POST" action="{{ url_for('freelancer.delete_portfolio', item_id=item.id) }}">
+                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form method="POST" class="row g-2">
+                <input type="hidden" name="section" value="portfolio">
+                <div class="col-md-4">
+                    <input type="text" name="title" class="form-control form-control-sm" placeholder="Project title"
+                        required>
+                </div>
+                <div class="col-md-4">
+                    <input type="url" name="link" class="form-control form-control-sm" placeholder="URL (optional)">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="description" class="form-control form-control-sm"
+                        placeholder="Short description">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Education -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Education</div>
+            {% if education %}
+            <ul class="list-group list-group-flush mb-3">
+                {% for e in education %}
+                <li class="list-group-item d-flex justify-content-between"
+                    style="background:transparent;border-color:var(--border);">
+                    <div>
+                        <div class="fw-600">{{ e.degree }} — {{ e.institution }}</div>
+                        <div class="text-muted small">{{ e.field_of_study }} &middot; {{ e.start_year }}–{{ e.end_year
+                            or 'Present' }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('freelancer.delete_education', edu_id=e.id) }}">
+                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form method="POST" class="row g-2">
+                <input type="hidden" name="section" value="education">
+                <div class="col-md-3">
+                    <input type="text" name="degree" class="form-control form-control-sm"
+                        placeholder="Degree (B.Sc., M.Tech…)" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="institution" class="form-control form-control-sm" placeholder="Institution"
+                        required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="field_of_study" class="form-control form-control-sm"
+                        placeholder="Field of study">
+                </div>
+                <div class="col-md-1">
+                    <input type="number" name="start_year" class="form-control form-control-sm" placeholder="From"
+                        min="1970" max="2030">
+                </div>
+                <div class="col-md-1">
+                    <input type="number" name="end_year" class="form-control form-control-sm" placeholder="To">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Experience -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Work Experience</div>
+            {% if experience %}
+            <ul class="list-group list-group-flush mb-3">
+                {% for ex in experience %}
+                <li class="list-group-item d-flex justify-content-between"
+                    style="background:transparent;border-color:var(--border);">
+                    <div>
+                        <div class="fw-600">{{ ex.job_title }} at {{ ex.company }}</div>
+                        <div class="text-muted small">{{ ex.start_date }} – {{ ex.end_date or 'Present' }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('freelancer.delete_experience', exp_id=ex.id) }}">
+                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <form method="POST" class="row g-2">
+                <input type="hidden" name="section" value="experience">
+                <div class="col-md-3">
+                    <input type="text" name="job_title" class="form-control form-control-sm" placeholder="Job title"
+                        required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="company" class="form-control form-control-sm" placeholder="Company"
+                        required>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="start_date" class="form-control form-control-sm"
+                        placeholder="Start (YYYY-MM)">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="end_date" class="form-control form-control-sm"
+                        placeholder="End (blank=now)">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Password -->
+        <div class="card p-4">
+            <div class="section-title">Change Password</div>
+            <form method="POST" data-loading>
+                <input type="hidden" name="section" value="password">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="current_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="new_password" class="form-control" required minlength="8">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" name="confirm_password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-outline-primary fw-600">Update Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

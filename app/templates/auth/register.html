@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Create Account — FreelanceHub{% endblock %}
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5"
+    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #10b981 100%);">
+    <div class="container" style="max-width:500px;">
+        <div class="card p-4 fade-in-up">
+            <div class="text-center mb-4">
+                <div class="fs-1 mb-2"><i class="bi bi-briefcase-fill text-primary"></i></div>
+                <h2 class="fw-800 mb-0">Join FreelanceHub</h2>
+                <p class="text-muted small">Create your free account today</p>
+            </div>
+
+            <form method="POST" data-loading>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control"
+                            value="{{ form.get('first_name','') }}" required placeholder="John">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" value="{{ form.get('last_name','') }}"
+                            required placeholder="Doe">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ form.get('email','') }}" required
+                        placeholder="you@example.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">I am a…</label>
+                    <div class="d-flex gap-3">
+                        <div class="role-card flex-fill p-3 rounded-xl border text-center"
+                            onclick="selectRole('client',this)" id="roleCardClient"
+                            style="cursor:pointer;border:2px solid var(--border)!important;transition:all .2s;">
+                            <i class="bi bi-person-workspace fs-3 text-primary"></i>
+                            <div class="fw-600 mt-1">Client</div>
+                            <div class="text-muted small">I hire freelancers</div>
+                            <input type="radio" name="role" value="client" hidden id="roleClient">
+                        </div>
+                        <div class="role-card flex-fill p-3 rounded-xl border text-center"
+                            onclick="selectRole('freelancer',this)" id="roleCardFreelancer"
+                            style="cursor:pointer;border:2px solid var(--border)!important;transition:all .2s;">
+                            <i class="bi bi-laptop fs-3 text-primary"></i>
+                            <div class="fw-600 mt-1">Freelancer</div>
+                            <div class="text-muted small">I offer services</div>
+                            <input type="radio" name="role" value="freelancer" hidden id="roleFreelancer">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" name="password" id="regPwd" class="form-control"
+                            placeholder="Min 8 characters" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('regPwd',this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="confirm_password" class="form-control" placeholder="Repeat password"
+                        required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                    <i class="bi bi-person-plus me-2"></i>Create Account
+                </button>
+            </form>
+
+            <hr class="my-3" style="border-color:var(--border)">
+            <p class="text-center text-muted small mb-0">
+                Already have an account?
+                <a href="{{ url_for('auth.login') }}" class="fw-600">Log In</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    function togglePwd(id, btn) {
+        const inp = document.getElementById(id);
+        const isText = inp.type === 'text';
+        inp.type = isText ? 'password' : 'text';
+        btn.innerHTML = isText ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+    }
+    function selectRole(role, card) {
+        document.querySelectorAll('.role-card').forEach(c => {
+            c.style.borderColor = 'var(--border)';
+            c.style.background = 'transparent';
+        });
+        card.style.borderColor = 'var(--primary)';
+        card.style.background = 'rgba(99,102,241,.08)';
+        document.getElementById(role === 'client' ? 'roleClient' : 'roleFreelancer').checked = true;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Inbox — FreelanceHub{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-chat-dots-fill text-primary me-2"></i>Messages</h1>
+</div>
+<div class="card">
+    {% if conversations %}
+    <ul class="list-group list-group-flush">
+        {% for c in conversations %}
+        <li class="list-group-item" style="background:transparent;border-color:var(--border);">
+            <a href="{{ url_for('chat.conversation', project_id=c.project_id, other_user_id=c.other_user_id) }}"
+                class="d-flex align-items-center gap-3 text-decoration-none">
+                <div class="avatar-placeholder {{ 'bg-primary' if c.unread_count else '' }}">
+                    {{ c.other_first[0] | upper }}
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                    <div class="fw-600 text-body">{{ c.other_first }} {{ c.other_last }}</div>
+                    <div class="text-muted small text-truncate">{{ c.last_message | truncate(60) }}</div>
+                    <div class="text-muted x-small">{{ c.project_title | truncate(40) }}</div>
+                </div>
+                <div class="text-end flex-shrink-0">
+                    {% if c.unread_count %}
+                    <span class="badge bg-primary rounded-pill">{{ c.unread_count }}</span>
+                    {% endif %}
+                    <div class="text-muted x-small">{{ c.last_time.strftime('%b %d') if c.last_time else '' }}</div>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-chat-left fs-1 d-block mb-3"></i>
+        <h5>No messages yet</h5>
+        <p class="small">Messages appear here when you start chatting on a project.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

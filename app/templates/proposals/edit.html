@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Edit Proposal — FreelanceHub{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="page-header">
+            <h1 class="page-title">Edit Proposal</h1>
+            <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}" class="btn btn-outline-secondary"><i
+                    class="bi bi-arrow-left me-1"></i>Cancel</a>
+        </div>
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>Project budget: <strong>₹{{ project.budget_min }}–{{
+                project.budget_max }}</strong>
+        </div>
+        <div class="card p-4">
+            <form method="POST" enctype="multipart/form-data" data-loading>
+                <div class="mb-3">
+                    <label class="form-label">Cover Letter <span class="text-danger">*</span></label>
+                    <textarea name="cover_letter" class="form-control" rows="7"
+                        required>{{ proposal.cover_letter }}</textarea>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Bid Amount (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" name="bid_amount" class="form-control" min="1" required
+                                value="{{ proposal.bid_amount }}">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Delivery (days)</label>
+                        <input type="number" name="delivery_days" class="form-control" min="1" required
+                            value="{{ proposal.delivery_days }}">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Portfolio Links</label>
+                    <textarea name="portfolio_links" class="form-control"
+                        rows="2">{{ proposal.portfolio_links or '' }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

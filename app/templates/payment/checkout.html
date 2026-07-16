@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Payment Successful — FreelanceHub{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 text-center fade-in-up">
+        <div class="card p-5">
+            <div style="font-size:5rem;line-height:1;" class="mb-3">🎉</div>
+            <h2 class="fw-800 text-success mb-2">Payment Successful!</h2>
+            <p class="text-muted mb-4">
+                Your payment of <strong class="text-success">₹{{ payment.amount }}</strong>
+                for <strong>{{ payment.project_title }}</strong> has been confirmed.
+            </p>
+            <div class="card p-3 mb-4 text-start" style="background:var(--bg-input);">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted small">Payment ID</span>
+                    <code class="small">{{ payment.razorpay_payment_id }}</code>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Amount Paid</span>
+                    <span class="fw-700 text-success">₹{{ payment.amount }}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{{ url_for('payment.invoice', payment_id=payment.id) }}" class="btn btn-primary fw-600">
+                    <i class="bi bi-file-earmark-text me-2"></i>View Invoice
+                </a>
+                <a href="{{ url_for('client.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

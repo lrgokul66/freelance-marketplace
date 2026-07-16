@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Proposal Details — FreelanceHub{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Proposal Details</h1>
+                <p class="page-subtitle">{{ proposal.project_title | truncate(50) }}</p>
+            </div>
+            <a href="{{ url_for('freelancer.my_proposals') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+        <div class="card p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge badge-status-{{ proposal.status }} p-2">{{ proposal.status | title }}</span>
+                <span class="text-muted small">{{ proposal.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            <dl class="row mb-3">
+                <dt class="col-4 text-muted small">Bid Amount</dt>
+                <dd class="col-8 fw-700 text-primary">₹{{ proposal.bid_amount }}</dd>
+                <dt class="col-4 text-muted small">Delivery</dt>
+                <dd class="col-8">{{ proposal.delivery_days }} days</dd>
+                {% if proposal.portfolio_links %}
+                <dt class="col-4 text-muted small">Portfolio</dt>
+                <dd class="col-8">
+                    {% for link in proposal.portfolio_links.splitlines() %}
+                    <a href="{{ link }}" target="_blank" class="d-block small">{{ link | truncate(60) }}</a>
+                    {% endfor %}
+                </dd>
+                {% endif %}
+            </dl>
+            <div class="section-title">Cover Letter</div>
+            <p style="white-space:pre-wrap;">{{ proposal.cover_letter }}</p>
+
+            {% if files %}
+            <div class="section-title mt-3">Attachments</div>
+            <ul class="list-unstyled">
+                {% for f in files %}
+                <li><i class="bi bi-paperclip me-1"></i>
+                    <a href="{{ url_for('proposals.download_attachment', filename=f.file_path) }}" target="_blank">
+                        {{ f.original_name or f.file_path }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        {% if proposal.status == 'pending' %}
+        <div class="d-flex gap-3">
+            <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}" class="btn btn-primary flex-fill"><i
+                    class="bi bi-pencil me-2"></i>Edit Proposal</a>
+            <form method="POST" action="{{ url_for('proposals.withdraw', proposal_id=proposal.id) }}"
+                onsubmit="return confirm('Withdraw this proposal?')">
+                <button class="btn btn-outline-danger"><i class="bi bi-x-circle me-1"></i>Withdraw</button>
+            </form>
+        </div>
+        {% elif proposal.status == 'accepted' %}
+        <div class="alert alert-success d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span>Congratulations! You've been hired.</span>
+            <a href="{{ url_for('chat.conversation', project_id=proposal.project_id, other_user_id=proposal.client_id) }}"
+                class="btn btn-sm btn-success ms-auto">Chat with Client</a>
+        </div>
+        {% elif proposal.status == 'rejected' %}
+        <div class="alert alert-danger">Your proposal was not selected for this project.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

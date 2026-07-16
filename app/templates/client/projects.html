@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}My Projects — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('client.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link active" href="{{ url_for('client.my_projects') }}"><i class="bi bi-folder2-open"></i> My
+        Projects</a>
+    <a class="nav-link" href="{{ url_for('client.create_project') }}"><i class="bi bi-plus-circle"></i> Post Project</a>
+    <div class="sidebar-label">Account</div>
+    <a class="nav-link" href="{{ url_for('client.profile') }}"><i class="bi bi-person-circle"></i> Profile</a>
+    <a class="nav-link" href="{{ url_for('chat.inbox') }}"><i class="bi bi-chat-dots"></i> Messages</a>
+    <a class="nav-link" href="{{ url_for('payment.history') }}"><i class="bi bi-credit-card"></i> Payments</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Projects</h1>
+        <p class="page-subtitle">{{ projects | length }} project{{ 's' if projects | length != 1 }}</p>
+    </div>
+    <a href="{{ url_for('client.create_project') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Post New Project
+    </a>
+</div>
+
+{% if projects %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Budget</th>
+                    <th>Proposals</th>
+                    <th>Status</th>
+                    <th>Posted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in projects %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('client.view_project', project_id=p.id) }}" class="fw-600 text-body">
+                            {{ p.title | truncate(45) }}
+                        </a>
+                        <div class="text-muted small">{{ p.category }}</div>
+                    </td>
+                    <td class="small">₹{{ p.budget_min }}–{{ p.budget_max }}</td>
+                    <td>
+                        <span class="badge bg-info rounded-pill">{{ p.proposal_count }}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-status-{{ p.status }}">
+                            {{ p.status | replace('_',' ') | title }}
+                        </span>
+                    </td>
+                    <td class="small text-muted">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="{{ url_for('client.view_project', project_id=p.id) }}"
+                                class="btn btn-sm btn-outline-primary">View</a>
+                            {% if p.status in ('open','hiring') %}
+                            <a href="{{ url_for('client.edit_project', project_id=p.id) }}"
+                                class="btn btn-sm btn-outline-secondary">Edit</a>
+                            {% endif %}
+                            {% if p.status == 'open' %}
+                            <form method="POST" action="{{ url_for('client.close_project', project_id=p.id) }}"
+                                onsubmit="return confirm('Close this project?')">
+                                <button class="btn btn-sm btn-outline-danger">Close</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card p-5 text-center text-muted">
+    <i class="bi bi-folder-plus fs-1 d-block mb-3"></i>
+    <h5>No projects yet.</h5>
+    <p class="small">Post your first project and start receiving proposals.</p>
+    <a href="{{ url_for('client.create_project') }}" class="btn btn-primary mt-2">Post a Project</a>
+</div>
+{% endif %}
+{% endblock %}

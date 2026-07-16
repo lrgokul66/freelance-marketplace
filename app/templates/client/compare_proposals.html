@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Compare Proposals — FreelanceHub{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Compare Proposals</h1>
+        <p class="page-subtitle">{{ project.title | truncate(50) }}</p>
+    </div>
+    <a href="{{ url_for('client.view_project', project_id=project.id) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Project
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead class="compare-header">
+                <tr>
+                    <th>Freelancer</th>
+                    <th>Bid (₹)</th>
+                    <th>Delivery</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Cover Letter</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set min_bid = proposals | map(attribute='bid_amount') | min %}
+                {% set min_days = proposals | map(attribute='delivery_days') | min %}
+                {% for p in proposals %}
+                <tr class="{{ 'compare-winner' if p.bid_amount == min_bid and p.delivery_days == min_days }}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-placeholder">{{ p.freelancer_first[0] | upper }}</div>
+                            <div>
+                                <div class="fw-600">{{ p.freelancer_first }} {{ p.freelancer_last }}</div>
+                                <div class="text-muted x-small">{{ p.freelancer_headline | truncate(30) if
+                                    p.freelancer_headline }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-700 {{ 'text-success' if p.bid_amount == min_bid }}">
+                            ₹{{ p.bid_amount }}
+                            {% if p.bid_amount == min_bid %}<i class="bi bi-arrow-down-circle-fill text-success ms-1"
+                                title="Lowest bid"></i>{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="{{ 'text-success fw-600' if p.delivery_days == min_days }}">
+                            {{ p.delivery_days }} days
+                            {% if p.delivery_days == min_days %}<i class="bi bi-lightning-fill text-warning ms-1"
+                                title="Fastest"></i>{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="stars small">
+                            {% if p.avg_rating %}
+                            {% for i in range(p.avg_rating | int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                            <span class="text-muted ms-1 small">{{ "%.1f" | format(p.avg_rating) }}</span>
+                            {% else %}<span class="text-muted small">No reviews</span>{% endif %}
+                        </div>
+                    </td>
+                    <td><span class="badge badge-status-{{ p.status }}">{{ p.status | title }}</span></td>
+                    <td class="small text-muted" style="max-width:220px;">{{ p.cover_letter | truncate(100) }}</td>
+                    <td>
+                        {% if p.status in ('pending','shortlisted') %}
+                        <div class="d-flex gap-1 flex-column">
+                            <form method="POST" action="{{ url_for('client.proposal_action', proposal_id=p.id) }}"
+                                onsubmit="return confirm('Hire {{ p.freelancer_first }}?')">
+                                <input type="hidden" name="action" value="hire">
+                                <button class="btn btn-sm btn-success w-100">Hire</button>
+                            </form>
+                            {% if p.status == 'pending' %}
+                            <form method="POST" action="{{ url_for('client.proposal_action', proposal_id=p.id) }}">
+                                <input type="hidden" name="action" value="shortlist">
+                                <button class="btn btn-sm btn-outline-primary w-100">Shortlist</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('client.proposal_action', proposal_id=p.id) }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button class="btn btn-sm btn-outline-danger w-100">Reject</button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <span class="text-muted small">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

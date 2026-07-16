@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Login — FreelanceHub{% endblock %}
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-5"
+    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #10b981 100%);">
+    <div class="container" style="max-width:440px;">
+        <div class="card p-4 fade-in-up">
+            <div class="text-center mb-4">
+                <div class="fs-1 mb-2"><i class="bi bi-briefcase-fill text-primary"></i></div>
+                <h2 class="fw-800 mb-0">Welcome back</h2>
+                <p class="text-muted small">Log in to your FreelanceHub account</p>
+            </div>
+
+            <form method="POST" data-loading>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" name="email" class="form-control" placeholder="you@example.com" required
+                            autofocus>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" name="password" id="loginPwd" class="form-control" placeholder="••••••••"
+                            required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('loginPwd',this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label small" for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="{{ url_for('auth.forgot_password') }}" class="small">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Log In
+                </button>
+            </form>
+
+            <hr class="my-3" style="border-color:var(--border)">
+            <p class="text-center text-muted small mb-0">
+                Don't have an account?
+                <a href="{{ url_for('auth.register') }}" class="fw-600">Sign Up</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    function togglePwd(id, btn) {
+        const inp = document.getElementById(id);
+        const isText = inp.type === 'text';
+        inp.type = isText ? 'password' : 'text';
+        btn.innerHTML = isText ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+    }
+</script>
+{% endblock %}

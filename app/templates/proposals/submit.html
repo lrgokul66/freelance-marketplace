@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Submit Proposal — FreelanceHub{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Submit Proposal</h1>
+                <p class="page-subtitle">For: <strong>{{ project.title }}</strong></p>
+            </div>
+            <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+
+        <!-- Project Budget Hint -->
+        <div class="alert alert-info fade-in">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Client budget: <strong>₹{{ project.budget_min }} – ₹{{ project.budget_max }}</strong>
+            &nbsp;•&nbsp; Experience: <strong>{{ project.experience_level | title }}</strong>
+        </div>
+
+        <div class="card p-4">
+            <form method="POST" enctype="multipart/form-data" data-loading>
+                <div class="mb-3">
+                    <label class="form-label">Cover Letter <span class="text-danger">*</span></label>
+                    <textarea name="cover_letter" class="form-control" rows="7" required
+                        placeholder="Introduce yourself, highlight relevant experience, explain your approach…"></textarea>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Your Bid (₹) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" name="bid_amount" class="form-control" required min="1"
+                                placeholder="0">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Delivery (days) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" name="delivery_days" class="form-control" required min="1" value="7">
+                            <span class="input-group-text">days</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Portfolio Links <span class="text-muted small">(optional, one per
+                            line)</span></label>
+                    <textarea name="portfolio_links" class="form-control" rows="2"
+                        placeholder="https://github.com/you&#10;https://portfolio.example.com"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Attachments <span class="text-muted small">(optional, up to 5
+                            files)</span></label>
+                    <input type="file" name="attachments" class="form-control" multiple accept="*/*">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                    <i class="bi bi-send me-2"></i>Submit Proposal
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

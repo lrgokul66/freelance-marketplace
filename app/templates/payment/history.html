@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Payment History — FreelanceHub{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-credit-card-fill text-primary me-2"></i>Payment History</h1>
+</div>
+<div class="card">
+    {% if payments %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Project</th>
+                    {% if session.role == 'client' %}<th>Freelancer</th>{% else %}<th>Client</th>{% endif %}
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td class="text-muted small">INV-{{ '%06d' | format(p.id) }}</td>
+                    <td class="fw-600 small">{{ p.project_title | truncate(30) }}</td>
+                    {% if session.role == 'client' %}
+                    <td class="small">{{ p.freelancer_first }} {{ p.freelancer_last }}</td>
+                    {% else %}
+                    <td class="small">{{ p.client_first }} {{ p.client_last }}</td>
+                    {% endif %}
+                    <td class="fw-700 text-success">₹{{ p.amount }}</td>
+                    <td>
+                        <span class="badge badge-status-{{ p.status }}">{{ p.status | title }}</span>
+                    </td>
+                    <td class="small text-muted">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+                    <td>
+                        {% if p.status == 'completed' %}
+                        <a href="{{ url_for('payment.invoice', payment_id=p.id) }}"
+                            class="btn btn-sm btn-outline-primary">Invoice</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-credit-card fs-1 d-block mb-3"></i>
+        <h5>No transactions yet.</h5>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

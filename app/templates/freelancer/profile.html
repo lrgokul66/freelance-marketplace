@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}My Profile — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Main</div>
+    <a class="nav-link" href="{{ url_for('freelancer.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link active" href="{{ url_for('freelancer.profile') }}"><i class="bi bi-person-circle"></i>
+        Profile</a>
+    <a class="nav-link" href="{{ url_for('freelancer.edit_profile') }}"><i class="bi bi-gear"></i> Settings</a>
+    <a class="nav-link" href="{{ url_for('freelancer.browse_projects') }}"><i class="bi bi-search"></i> Find
+        Projects</a>
+    <a class="nav-link" href="{{ url_for('freelancer.my_proposals') }}"><i class="bi bi-file-earmark-text"></i> My
+        Proposals</a>
+    <a class="nav-link" href="{{ url_for('freelancer.saved_projects') }}"><i class="bi bi-bookmark"></i> Saved</a>
+    <hr style="border-color:var(--border)">
+    <a class="nav-link text-danger" href="{{ url_for('auth.delete_account') }}"><i class="bi bi-trash"></i> Delete
+        Account</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <!-- Left -->
+    <div class="col-md-4">
+        <div class="card p-4 text-center mb-3">
+            <div class="avatar-placeholder avatar-xl mx-auto mb-3" style="font-size:2rem;">
+                {{ profile.first_name[0]|upper }}{{ profile.last_name[0]|upper }}
+            </div>
+            <h4 class="fw-800 mb-0">{{ profile.first_name }} {{ profile.last_name }}</h4>
+            {% if fp and fp.headline %}
+            <p class="text-muted small mt-1 mb-1">{{ fp.headline }}</p>
+            {% endif %}
+            <span class="badge bg-success mb-2">Freelancer</span>
+            {% if fp and fp.hourly_rate %}
+            <div class="fw-700 text-primary">₹{{ fp.hourly_rate }}/hr</div>
+            {% endif %}
+            {% if avg_rating %}
+            <div class="stars mt-2">
+                {% for i in range(avg_rating | int) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                <span class="ms-1 small text-muted">{{ "%.1f" | format(avg_rating) }} ({{ review_count }}
+                    reviews)</span>
+            </div>
+            {% endif %}
+            <div class="mt-3">
+                <a href="{{ url_for('freelancer.edit_profile') }}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+
+        {% if skills %}
+        <div class="card p-3 mb-3">
+            <div class="section-title">Skills</div>
+            {% for s in skills %}<span class="skill-tag">{{ s.name }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if fp %}
+        <div class="card p-3">
+            <div class="section-title">Details</div>
+            <dl class="row small mb-0">
+                {% if fp.location %}
+                <dt class="col-5 text-muted">Location</dt>
+                <dd class="col-7">{{ fp.location }}</dd>
+                {% endif %}
+                {% if fp.availability %}
+                <dt class="col-5 text-muted">Availability</dt>
+                <dd class="col-7">{{ fp.availability | replace('_',' ') | title }}</dd>
+                {% endif %}
+                {% if fp.experience_years %}
+                <dt class="col-5 text-muted">Experience</dt>
+                <dd class="col-7">{{ fp.experience_years }} yrs</dd>
+                {% endif %}
+            </dl>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right -->
+    <div class="col-md-8">
+        {% if fp and fp.bio %}
+        <div class="card p-4 mb-3">
+            <div class="section-title">Bio</div>
+            <p class="mb-0" style="white-space:pre-wrap;">{{ fp.bio }}</p>
+        </div>
+        {% endif %}
+
+        {% if portfolio %}
+        <div class="card p-4 mb-3">
+            <div class="section-title">Portfolio</div>
+            <div class="row g-3">
+                {% for item in portfolio %}
+                <div class="col-sm-6">
+                    <div class="card p-3" style="background:var(--bg-input);">
+                        <div class="fw-600 mb-1">{{ item.title }}</div>
+                        <p class="small text-muted mb-1">{{ item.description | truncate(80) }}</p>
+                        {% if item.link %}<a href="{{ item.link }}" target="_blank" class="small">View Project <i
+                                class="bi bi-arrow-up-right"></i></a>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if education %}
+        <div class="card p-4 mb-3">
+            <div class="section-title">Education</div>
+            {% for e in education %}
+            <div class="mb-2">
+                <div class="fw-600">{{ e.degree }} in {{ e.field_of_study }}</div>
+                <div class="text-muted small">{{ e.institution }} &middot; {{ e.start_year }}–{{ e.end_year or 'Present'
+                    }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if experience %}
+        <div class="card p-4 mb-3">
+            <div class="section-title">Experience</div>
+            {% for ex in experience %}
+            <div class="mb-2">
+                <div class="fw-600">{{ ex.job_title }} at {{ ex.company }}</div>
+                <div class="text-muted small">{{ ex.start_date }} – {{ ex.end_date or 'Present' }}</div>
+                {% if ex.description %}<p class="small mt-1 mb-0">{{ ex.description | truncate(120) }}</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if reviews %}
+        <div class="card p-4">
+            <div class="section-title">Reviews</div>
+            {% for r in reviews %}
+            <div class="mb-3 pb-3" style="border-bottom:1px solid var(--border);">
+                <div class="stars small">
+                    {% for i in range(r.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                </div>
+                <p class="small mt-1 mb-0">{{ r.comment }}</p>
+                <div class="text-muted x-small mt-1">{{ r.reviewer_first }} {{ r.reviewer_last }} &middot; {{
+                    r.created_at.strftime('%b %Y') }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Chat — {{ project.title }} — FreelanceHub{% endblock %}
+{% block extra_css %}
+<style>
+    .chat-wrapper {
+        height: calc(100vh - 140px);
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- Hidden inputs for JS -->
+<input type="hidden" id="chatPollUrl"
+    value="{{ url_for('chat.poll_messages', project_id=project.id, other_user_id=other_user.id) }}">
+<input type="hidden" id="chatMyId" value="{{ session.user_id }}">
+<input type="hidden" id="chatLastId" value="{{ messages[-1].id if messages else 0 }}">
+
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a href="{{ url_for('chat.inbox') }}" class="btn btn-sm btn-outline-secondary"><i
+                class="bi bi-arrow-left"></i></a>
+        <div class="avatar-placeholder">{{ other_user.first_name[0] | upper }}</div>
+        <div>
+            <div class="fw-700">{{ other_user.first_name }} {{ other_user.last_name }}</div>
+            <div class="text-muted small">Re: {{ project.title | truncate(40) }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card chat-wrapper" style="height:calc(100vh - 200px);">
+    <!-- Messages -->
+    <div id="chatMessages" class="chat-messages flex-grow-1 p-3" style="overflow-y:auto;">
+        {% for m in messages %}
+        <div class="d-flex {{ 'justify-content-end' if m.sender_id == session.user_id }} mb-1">
+            <div class="chat-bubble {{ 'sent' if m.sender_id == session.user_id else 'received' }}">
+                {% if m.content %}<div>{{ m.content }}</div>{% endif %}
+                {% if m.file_path %}
+                {% set ext = m.file_path.split('.')[-1].lower() %}
+                {% if ext in ['png','jpg','jpeg','gif','webp'] %}
+                <img src="{{ url_for('static', filename='uploads/chat_files/'+m.file_path) }}"
+                    class="img-fluid rounded mt-1" style="max-width:200px;">
+                {% else %}
+                <a href="{{ url_for('static', filename='uploads/chat_files/'+m.file_path) }}" class="d-block mt-1"
+                    target="_blank">
+                    <i class="bi bi-paperclip me-1"></i>{{ m.file_name or m.file_path }}
+                </a>
+                {% endif %}
+                {% endif %}
+                <div class="chat-meta">{{ m.first_name }} • {{ m.created_at.strftime('%H:%M') }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+        <form id="chatSendForm" method="POST" action="{{ url_for('chat.send_message') }}" enctype="multipart/form-data"
+            class="d-flex gap-2 align-items-end">
+            <input type="hidden" name="project_id" value="{{ project.id }}">
+            <input type="hidden" name="receiver_id" value="{{ other_user.id }}">
+            <div class="flex-grow-1">
+                <textarea name="content" id="chatInput" class="form-control" rows="1" placeholder="Type a message…"
+                    style="resize:none;min-height:44px;max-height:120px;overflow-y:auto;"
+                    onInput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            </div>
+            <label class="btn btn-outline-secondary mb-0" title="Attach file">
+                <i class="bi bi-paperclip"></i>
+                <input type="file" name="file" class="d-none" accept="*/*">
+            </label>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+        <div id="fileNameDisplay" class="text-muted small mt-1"></div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    // Show file name on select
+    document.querySelector('input[name="file"]').addEventListener('change', function () {
+        document.getElementById('fileNameDisplay').textContent =
+            this.files[0] ? '📎 ' + this.files[0].name : '';
+    });
+    // Send on Ctrl+Enter
+    document.getElementById('chatInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); document.getElementById('chatSendForm').submit(); }
+    });
+</script>
+{% endblock %}

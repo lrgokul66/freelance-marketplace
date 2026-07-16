@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — FreelanceHub{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <!-- Main -->
+    <div class="col-lg-8">
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                <div>
+                    <span class="skill-tag mb-1">{{ project.category }}</span>
+                    <h1 class="page-title mt-2">{{ project.title }}</h1>
+                </div>
+                <span class="badge badge-status-{{ project.status }} p-2">
+                    {{ project.status | replace('_',' ') | title }}
+                </span>
+            </div>
+
+            <div class="d-flex gap-4 text-muted small mb-4 flex-wrap">
+                <span><i class="bi bi-currency-rupee"></i> ₹{{ project.budget_min }} – ₹{{ project.budget_max }}</span>
+                <span><i class="bi bi-calendar"></i> {{ project.created_at.strftime('%b %d, %Y') }}</span>
+                <span><i class="bi bi-eye"></i> {{ project.views }} views</span>
+                <span><i class="bi bi-file-earmark-text"></i> {{ project.proposal_count or 0 }} proposals</span>
+                {% if project.duration %}
+                <span><i class="bi bi-clock"></i> {{ project.duration | replace('_',' ') | title }}</span>
+                {% endif %}
+                {% if project.experience_level %}
+                <span><i class="bi bi-bar-chart"></i> {{ project.experience_level | title }}</span>
+                {% endif %}
+            </div>
+
+            <div class="section-title">Project Description</div>
+            <p class="mb-4" style="white-space:pre-wrap;">{{ project.description }}</p>
+
+            {% if skills %}
+            <div class="section-title">Skills Required</div>
+            <div class="mb-4">
+                {% for sk in skills %}<span class="skill-tag">{{ sk.name }}</span>{% endfor %}
+            </div>
+            {% endif %}
+
+            {% if files %}
+            <div class="section-title">Attachments</div>
+            <ul class="list-unstyled mb-4">
+                {% for f in files %}
+                <li><i class="bi bi-paperclip me-1"></i>
+                    <a href="{{ url_for('static', filename='uploads/project_files/' + f.file_path) }}"
+                        target="_blank">{{ f.original_name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <!-- Reviews -->
+        {% if reviews %}
+        <div class="card p-4">
+            <div class="section-title">Reviews</div>
+            {% for r in reviews %}
+            <div class="d-flex gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--border);">
+                <div class="avatar-placeholder">{{ r.reviewer_first[0] | upper }}</div>
+                <div>
+                    <div class="fw-600">{{ r.reviewer_first }} {{ r.reviewer_last }}</div>
+                    <div class="stars small">
+                        {% for i in range(r.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                        {% for i in range(5 - r.rating) %}<i class="bi bi-star"></i>{% endfor %}
+                    </div>
+                    <p class="small mt-1 mb-0 text-muted">{{ r.comment }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Client Info -->
+        <div class="card p-4 mb-3">
+            <div class="section-title">About the Client</div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="avatar-placeholder avatar-lg">
+                    {{ project.client_first[0] | upper }}{{ project.client_last[0] | upper }}
+                </div>
+                <div>
+                    <div class="fw-700">{{ project.client_first }} {{ project.client_last }}</div>
+                    <div class="text-muted small">Member since {{ project.client_joined.strftime('%Y') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        {% if session.role == 'freelancer' and project.status in ('open','hiring') %}
+        <div class="card p-4 mb-3">
+            <a href="{{ url_for('proposals.submit', project_id=project.id) }}"
+                class="btn btn-primary w-100 py-2 fw-600">
+                <i class="bi bi-send me-2"></i>Submit Proposal
+            </a>
+            <form method="POST" action="{{ url_for('freelancer.toggle_save_project', project_id=project.id) }}"
+                class="mt-2">
+                <button class="btn btn-outline-secondary w-100" type="submit">
+                    <i class="bi bi-bookmark me-2"></i>Save Project
+                </button>
+            </form>
+        </div>
+        {% elif session.role == 'client' and project.client_id == session.user_id %}
+        <div class="card p-4 mb-3">
+            <a href="{{ url_for('client.view_project', project_id=project.id) }}"
+                class="btn btn-primary w-100 py-2 fw-600 mb-2">
+                <i class="bi bi-gear me-2"></i>Manage Project
+            </a>
+        </div>
+        {% elif not session.user_id %}
+        <div class="card p-4 mb-3 text-center">
+            <p class="text-muted small mb-3">Sign in to submit a proposal</p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary w-100">Log In</a>
+        </div>
+        {% endif %}
+
+        <!-- Budget Summary -->
+        <div class="card p-3">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Budget Range</span>
+                <span class="fw-700">₹{{ project.budget_min }} – ₹{{ project.budget_max }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span class="text-muted small">Posted</span>
+                <span class="small">{{ project.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

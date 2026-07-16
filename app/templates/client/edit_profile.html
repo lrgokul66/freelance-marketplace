@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — FreelanceHub{% endblock %}
+{% block sidebar %}
+<aside class="sidebar">
+    <div class="sidebar-label">Account</div>
+    <a class="nav-link" href="{{ url_for('client.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link" href="{{ url_for('client.profile') }}"><i class="bi bi-person-circle"></i> Profile</a>
+    <a class="nav-link active" href="{{ url_for('client.edit_profile') }}"><i class="bi bi-gear"></i> Settings</a>
+    <hr style="border-color:var(--border)">
+    <a class="nav-link text-danger" href="{{ url_for('auth.delete_account') }}"><i class="bi bi-trash"></i> Delete
+        Account</a>
+</aside>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h1 class="page-title mb-4">Account Settings</h1>
+        <!-- Profile Info -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Personal Information</div>
+            <form method="POST" data-loading>
+                <input type="hidden" name="action" value="update_profile">
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-control" required
+                            value="{{ profile.first_name }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-control" required
+                            value="{{ profile.last_name }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Company / Organisation</label>
+                    <input type="text" name="company" class="form-control" value="{{ profile.company or '' }}"
+                        placeholder="Optional">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Country</label>
+                    <input type="text" name="country" class="form-control" value="{{ profile.country or '' }}"
+                        placeholder="Optional">
+                </div>
+                <button type="submit" class="btn btn-primary fw-600">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+            </form>
+        </div>
+        <!-- Change Password -->
+        <div class="card p-4">
+            <div class="section-title">Change Password</div>
+            <form method="POST" data-loading>
+                <input type="hidden" name="action" value="change_password">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="current_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="new_password" class="form-control" required minlength="8">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" name="confirm_password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-outline-primary fw-600">Update Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
