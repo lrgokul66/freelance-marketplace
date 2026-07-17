@@ -122,51 +122,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('projectAttachmentInput');
-        const container = document.getElementById('chunkedAttachmentsContainer');
-        const progressContainer = document.getElementById('projectAttachmentProgressContainer');
-        const progressBar = document.getElementById('projectAttachmentProgressBar');
-        const submitBtn = document.getElementById('postProjectSubmitBtn');
-        const removeBtn = document.getElementById('removeProjectAttachmentBtn');
-
         if (fileInput && window.initChunkedUpload) {
-            // Call our reusable main.js chunked upload helper
             window.initChunkedUpload(
                 'projectAttachmentInput',
                 'projectAttachmentProgressContainer',
                 'projectAttachmentProgressBar',
-                'chunkedAttachmentsContainer', // This will append hidden input fields with name="chunked_attachments"
-                'postProjectSubmitBtn'
+                'chunkedAttachmentsContainer',
+                'postProjectSubmitBtn',
+                'removeProjectAttachmentBtn'
             );
         }
-
-        // Show/hide remove button and handle click
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                removeBtn.classList.remove('d-none');
-            } else {
-                removeBtn.classList.add('d-none');
-            }
-        });
-
-        // Watch for when chunked upload adds files too
-        const observer = new MutationObserver(function () {
-            if (container.children.length > 0 || fileInput.files.length > 0) {
-                removeBtn.classList.remove('d-none');
-            } else {
-                removeBtn.classList.add('d-none');
-            }
-        });
-        observer.observe(container, { childList: true });
-
-        removeBtn.addEventListener('click', function () {
-            fileInput.value = "";
-            container.innerHTML = "";
-            progressContainer.classList.add('d-none');
-            progressBar.style.width = "0%";
-            progressBar.textContent = "0%";
-            removeBtn.classList.add('d-none');
-            if (submitBtn) submitBtn.disabled = false;
-        });
     });
 </script>
 {% endblock %}

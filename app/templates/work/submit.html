@@ -26,13 +26,21 @@
                             <i class="bi bi-x-circle me-1"></i>Deselect
                         </button>
                     </div>
+
+                    <!-- Progress bar -->
+                    <div class="progress mt-2 d-none" id="workFileProgressContainer" style="height: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="workFileProgressBar"
+                            style="width: 0%;">0%</div>
+                    </div>
+                    <!-- Hidden field container -->
+                    <div id="chunkedAttachmentsContainer"></div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Notes for Client <span class="text-muted small">(optional)</span></label>
                     <textarea name="notes" class="form-control" rows="4"
                         placeholder="Describe what you've delivered, any instructions, notes…"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                <button type="submit" id="submitWorkBtn" class="btn btn-primary w-100 py-2 fw-600">
                     <i class="bi bi-send me-2"></i>Submit for Review
                 </button>
             </form>
@@ -45,6 +53,7 @@
     const fileInput = document.getElementById('workFileInput');
     const nameLabel = document.getElementById('workFileNameLabel');
     const removeBtn = document.getElementById('removeWorkFileBtn');
+    const container = document.getElementById('chunkedAttachmentsContainer');
 
     function updateFileDisplay() {
         if (fileInput.files && fileInput.files[0]) {
@@ -52,16 +61,27 @@
             removeBtn.classList.remove('d-none');
         } else {
             nameLabel.textContent = '';
-            removeBtn.classList.add('d-none');
+            if (container.children.length === 0) {
+                removeBtn.classList.add('d-none');
+            }
         }
     }
 
     fileInput.addEventListener('change', updateFileDisplay);
 
-    removeBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        fileInput.value = "";
-        updateFileDisplay();
+    if (fileInput && window.initChunkedUpload) {
+        window.initChunkedUpload(
+            'workFileInput',
+            'workFileProgressContainer',
+            'workFileProgressBar',
+            'chunkedAttachmentsContainer',
+            'submitWorkBtn',
+            'removeWorkFileBtn'
+        );
+    }
+
+    removeBtn.addEventListener('click', function () {
+        nameLabel.textContent = '';
     });
 
     // Drag & drop
@@ -73,6 +93,7 @@
         dz.classList.remove('active');
         fileInput.files = e.dataTransfer.files;
         updateFileDisplay();
+        fileInput.dispatchEvent(new Event('change'));
     });
 </script>
 {% endblock %}

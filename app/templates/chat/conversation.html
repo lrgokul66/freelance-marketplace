@@ -66,12 +66,17 @@
             </div>
             <label class="btn btn-outline-secondary mb-0" title="Attach file">
                 <i class="bi bi-paperclip"></i>
-                <input type="file" name="file" class="d-none" accept="*/*">
+                <input type="file" name="file" id="chatFileInputInput" class="d-none" accept="*/*">
             </label>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" id="chatSubmitBtn" class="btn btn-primary">
                 <i class="bi bi-send-fill"></i>
             </button>
         </form>
+        <div class="progress mt-1 d-none" id="chatFileProgressContainer" style="height: 12px; font-size: 0.65rem;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="chatFileProgressBar"
+                style="width: 0%;">0%</div>
+        </div>
+        <div id="chunkedAttachmentsContainer"></div>
         <div id="fileNameDisplay" class="text-muted small mt-1 d-flex justify-content-between align-items-center">
             <span id="chatFileNameLabel"></span>
             <button type="button" class="btn btn-sm btn-outline-danger d-none" id="removeChatFileBtn"
@@ -84,9 +89,10 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-    const chatFileInput = document.querySelector('input[name="file"]');
+    const chatFileInput = document.getElementById('chatFileInputInput');
     const chatNameLabel = document.getElementById('chatFileNameLabel');
     const chatRemoveBtn = document.getElementById('removeChatFileBtn');
+    const container = document.getElementById('chunkedAttachmentsContainer');
 
     function updateChatFileDisplay() {
         if (chatFileInput.files && chatFileInput.files[0]) {
@@ -94,15 +100,27 @@
             chatRemoveBtn.classList.remove('d-none');
         } else {
             chatNameLabel.textContent = '';
-            chatRemoveBtn.classList.add('d-none');
+            if (container.children.length === 0) {
+                chatRemoveBtn.classList.add('d-none');
+            }
         }
     }
 
     chatFileInput.addEventListener('change', updateChatFileDisplay);
-    chatRemoveBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        chatFileInput.value = "";
-        updateChatFileDisplay();
+
+    if (chatFileInput && window.initChunkedUpload) {
+        window.initChunkedUpload(
+            'chatFileInputInput',
+            'chatFileProgressContainer',
+            'chatFileProgressBar',
+            'chunkedAttachmentsContainer',
+            'chatSubmitBtn',
+            'removeChatFileBtn'
+        );
+    }
+
+    chatRemoveBtn.addEventListener('click', function () {
+        chatNameLabel.textContent = '';
     });
 
     // Send on Ctrl+Enter

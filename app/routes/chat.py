@@ -67,18 +67,32 @@ def send_message():
         return redirect(url_for('chat.inbox'))
 
     # Handle file attachment
-    f = request.files.get('file')
-    if f and f.filename:
-        try:
-            saved, orig = save_upload(
-                f, 'chat_files',
-                current_app.config['ALLOWED_DOC_EXTENSIONS'] |
-                current_app.config['ALLOWED_IMAGE_EXTENSIONS']
-            )
-            file_path = saved
-            file_name = orig
-        except ValueError as e:
-            flash(str(e), 'danger')
+    chunked_files = request.form.getlist('chunked_attachments')
+    if chunked_files and chunked_files[0]:
+        import os
+        import shutil
+        filename = chunked_files[0]
+        src_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        dest_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'chat_files')
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, filename)
+        if os.path.exists(src_path):
+            shutil.move(src_path, dest_path)
+        file_path = filename
+        file_name = filename.split('_', 1)[-1] if '_' in filename else filename
+    else:
+        f = request.files.get('file')
+        if f and f.filename:
+            try:
+                saved, orig = save_upload(
+                    f, 'chat_files',
+                    current_app.config['ALLOWED_DOC_EXTENSIONS'] |
+                    current_app.config['ALLOWED_IMAGE_EXTENSIONS']
+                )
+                file_path = saved
+                file_name = orig
+            except ValueError as e:
+                flash(str(e), 'danger')
 
     if not content and not file_path:
         flash('Message cannot be empty.', 'warning')

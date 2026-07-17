@@ -81,50 +81,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('proposalAttachmentInput');
-        const container = document.getElementById('chunkedAttachmentsContainer');
-        const progressContainer = document.getElementById('proposalAttachmentProgressContainer');
-        const progressBar = document.getElementById('proposalAttachmentProgressBar');
-        const submitBtn = document.getElementById('submitProposalBtn');
-        const removeBtn = document.getElementById('removeProposalAttachmentBtn');
-
         if (fileInput && window.initChunkedUpload) {
             window.initChunkedUpload(
                 'proposalAttachmentInput',
                 'proposalAttachmentProgressContainer',
                 'proposalAttachmentProgressBar',
-                'chunkedAttachmentsContainer', // stores name="chunked_attachments" hidden fields
-                'submitProposalBtn'
+                'chunkedAttachmentsContainer',
+                'submitProposalBtn',
+                'removeProposalAttachmentBtn'
             );
         }
-
-        // Show/hide remove button and handle click
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                removeBtn.classList.remove('d-none');
-            } else {
-                removeBtn.classList.add('d-none');
-            }
-        });
-
-        // Watch for when chunked upload adds files too
-        const observer = new MutationObserver(function () {
-            if (container.children.length > 0 || fileInput.files.length > 0) {
-                removeBtn.classList.remove('d-none');
-            } else {
-                removeBtn.classList.add('d-none');
-            }
-        });
-        observer.observe(container, { childList: true });
-
-        removeBtn.addEventListener('click', function () {
-            fileInput.value = "";
-            container.innerHTML = "";
-            progressContainer.classList.add('d-none');
-            progressBar.style.width = "0%";
-            progressBar.textContent = "0%";
-            removeBtn.classList.add('d-none');
-            if (submitBtn) submitBtn.disabled = false;
-        });
     });
 </script>
 {% endblock %}

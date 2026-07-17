@@ -29,12 +29,26 @@ def submit(project_id):
         return redirect(url_for('freelancer.dashboard'))
 
     if request.method == 'POST':
-        f = request.files.get('work_file')
+        chunked_files = request.form.getlist('chunked_attachments')
         notes = request.form.get('notes', '').strip()
         try:
-            saved, orig = save_upload(f, 'work_submissions',
-                                      current_app.config['ALLOWED_WORK_EXTENSIONS'])
-            WorkModel.submit(project_id, session['user_id'], saved, orig, notes)
+            if chunked_files and chunked_files[0]:
+                filename = chunked_files[0]
+                src_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                dest_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'work_submissions')
+                os.makedirs(dest_dir, exist_ok=True)
+                dest_path = os.path.join(dest_dir, filename)
+                if os.path.exists(src_path):
+                    import shutil
+                    shutil.move(src_path, dest_path)
+                orig_name = filename.split('_', 1)[-1] if '_' in filename else filename
+                WorkModel.submit(project_id, session['user_id'], filename, orig_name, notes)
+            else:
+                f = request.files.get('work_file')
+                saved, orig = save_upload(f, 'work_submissions',
+                                          current_app.config['ALLOWED_WORK_EXTENSIONS'])
+                WorkModel.submit(project_id, session['user_id'], saved, orig, notes)
+            
             # Notify client
             NotificationModel.create(
                 project['client_id'], 'work_submitted',

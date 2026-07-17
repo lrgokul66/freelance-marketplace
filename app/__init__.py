@@ -4,7 +4,7 @@ Freelance Marketplace — Flask Application Factory
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from config import get_config
 from database import init_db
 
@@ -49,6 +49,11 @@ def create_app():
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
     app.register_blueprint(work_bp,          url_prefix='/work')
     app.register_blueprint(upload_bp,        url_prefix='/upload')
+
+    # ── Serve uploads from external folder ──────────────────
+    @app.route('/static/uploads/<path:filename>')
+    def serve_uploads(filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
     # ── Custom error handlers ───────────────────────────────

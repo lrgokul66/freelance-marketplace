@@ -316,18 +316,20 @@ document.querySelectorAll('.custom-file-input-label').forEach(function (label) {
 })();
 
 /* ── Chunked File Upload Helper ───────────────────────────── */
-window.initChunkedUpload = function (fileInputId, progressContainerId, progressBarId, hiddenInputId, submitButtonId) {
+window.initChunkedUpload = function (fileInputId, progressContainerId, progressBarId, hiddenInputId, submitButtonId, removeButtonId) {
     const fileInput = document.getElementById(fileInputId);
     const progressContainer = document.getElementById(progressContainerId);
     const progressBar = document.getElementById(progressBarId);
     const hiddenInput = document.getElementById(hiddenInputId);
     const submitButton = submitButtonId ? document.getElementById(submitButtonId) : null;
+    const removeButton = removeButtonId ? document.getElementById(removeButtonId) : null;
 
     if (!fileInput || !progressContainer || !progressBar || !hiddenInput) {
         console.warn('initChunkedUpload: Missing HTML elements', { fileInputId, progressContainerId, progressBarId, hiddenInputId });
         return;
     }
 
+    const originalName = fileInput.getAttribute('name') || 'attachments_direct';
     const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
 
     fileInput.addEventListener('change', async function (e) {
@@ -346,6 +348,7 @@ window.initChunkedUpload = function (fileInputId, progressContainerId, progressB
         progressBar.style.width = '0%';
         progressBar.classList.remove('bg-success', 'bg-danger');
         progressBar.textContent = 'Preparing upload...';
+        if (removeButton) removeButton.classList.add('d-none');
 
         for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
             const start = chunkIndex * CHUNK_SIZE;
@@ -377,7 +380,14 @@ window.initChunkedUpload = function (fileInputId, progressContainerId, progressB
                 if (data.status === 'completed') {
                     progressBar.classList.add('bg-success');
                     progressBar.textContent = 'Upload Complete!';
-                    hiddenInput.value = data.filename;
+
+                    // Correctly append hidden input element within the container div
+                    hiddenInput.innerHTML = `<input type="hidden" name="chunked_attachments" value="${data.filename}">`;
+
+                    // Remove name attribute from fileInput to prevent uploading raw large file during form submit
+                    fileInput.removeAttribute('name');
+
+                    if (removeButton) removeButton.classList.remove('d-none');
                     if (submitButton) {
                         submitButton.disabled = false;
                     }
@@ -388,6 +398,9 @@ window.initChunkedUpload = function (fileInputId, progressContainerId, progressB
                 progressBar.classList.add('bg-danger');
                 progressBar.textContent = 'Upload Failed! Please try again.';
                 fileInput.value = ''; // Clean up input
+                fileInput.setAttribute('name', originalName);
+                hiddenInput.innerHTML = '';
+                if (removeButton) removeButton.classList.add('d-none');
                 if (submitButton) {
                     submitButton.disabled = false;
                 }
@@ -395,6 +408,22 @@ window.initChunkedUpload = function (fileInputId, progressContainerId, progressB
             }
         }
     });
+
+    if (removeButton) {
+        removeButton.addEventListener('click', function () {
+            fileInput.value = '';
+            fileInput.setAttribute('name', originalName);
+            hiddenInput.innerHTML = '';
+            progressContainer.classList.add('d-none');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressBar.classList.remove('bg-success', 'bg-danger');
+            removeButton.classList.add('d-none');
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+        });
+    }
 };
 
 
