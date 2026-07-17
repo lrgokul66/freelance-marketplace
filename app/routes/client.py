@@ -229,6 +229,28 @@ def edit_project(project_id):
 
         ProjectModel.update_project(project_id, data)
         ProjectModel.set_project_skills(project_id, skill_ids)
+
+        # Handle chunked uploads
+        chunked_files = request.form.getlist('chunked_attachments')
+        for filename in chunked_files:
+            if filename:
+                orig_name = filename.split('_', 1)[-1] if '_' in filename else filename
+                ProjectModel.add_file(project_id, filename, orig_name)
+
+        # Handle standard files attachments fallback (if any)
+        files = request.files.getlist('attachments')
+        for f in files:
+            if f and f.filename:
+                try:
+                    fname, orig = save_upload(
+                        f, 'project_files',
+                        current_app.config['ALLOWED_DOC_EXTENSIONS'] |
+                        current_app.config['ALLOWED_IMAGE_EXTENSIONS']
+                    )
+                    ProjectModel.add_file(project_id, fname, orig)
+                except ValueError:
+                    pass
+
         flash('Project updated.', 'success')
         return redirect(url_for('client.view_project', project_id=project_id))
 

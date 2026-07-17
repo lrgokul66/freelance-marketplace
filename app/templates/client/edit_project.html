@@ -87,14 +87,47 @@
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Add More Attachments</label>
-                    <input type="file" name="files" class="form-control" multiple>
+                    <label class="form-label">Add More Attachments <span class="text-muted small">(optional, up to 1GB
+                            using Chunked Upload)</span></label>
+                    <input type="file" id="editProjectAttachmentInput" class="form-control" name="attachments_direct">
+
+                    <!-- Progress bar -->
+                    <div class="progress mt-2 d-none" id="editProjectAttachmentProgressContainer" style="height: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                            id="editProjectAttachmentProgressBar" style="width: 0%;">0%</div>
+                    </div>
+
+                    <!-- Hidden fields container for chunked uploads -->
+                    <div id="chunkedAttachmentsContainer"></div>
+                    <div class="form-text">For files > 16MB, they will automatically be uploaded in 5MB slices.</div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                <button type="submit" id="editProjectSubmitBtn" class="btn btn-primary w-100 py-2 fw-600">
                     <i class="bi bi-check-circle me-2"></i>Save Changes
                 </button>
             </form>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('editProjectAttachmentInput');
+        const container = document.getElementById('chunkedAttachmentsContainer');
+        const progressContainer = document.getElementById('editProjectAttachmentProgressContainer');
+        const progressBar = document.getElementById('editProjectAttachmentProgressBar');
+        const submitBtn = document.getElementById('editProjectSubmitBtn');
+
+        if (fileInput && window.initChunkedUpload) {
+            window.initChunkedUpload(
+                'editProjectAttachmentInput',
+                'editProjectAttachmentProgressContainer',
+                'editProjectAttachmentProgressBar',
+                'chunkedAttachmentsContainer', // stores name="chunked_attachments" hidden fields
+                'editProjectSubmitBtn'
+            );
+        }
+    });
+</script>
+{% endblock %}
 {% endblock %}
