@@ -16,11 +16,53 @@
     <div class="col-lg-8">
         <h1 class="page-title mb-4">Edit Profile &amp; Settings</h1>
 
+        <!-- Profile Picture & Resume Card -->
+        <div class="card p-4 mb-4">
+            <div class="section-title">Profile Picture &amp; Resume</div>
+            <div class="row g-4">
+                <div class="col-md-6 d-flex align-items-center gap-3">
+                    {% set av_filename = get_user_avatar(session.user_id, session.role) %}
+                    {% if av_filename %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + av_filename) }}" class="avatar"
+                        style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+                    {% else %}
+                    <div class="avatar-placeholder"
+                        style="width:80px;height:80px;font-size:1.8rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg-input);color:var(--text-muted);font-weight:700;">
+                        {{ profile.first_name[0]|upper }}{{ profile.last_name[0]|upper }}
+                    </div>
+                    {% endif %}
+                    <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1" data-loading>
+                        <input type="hidden" name="action" value="upload_avatar">
+                        <label class="small fw-600 text-muted">Profile Picture</label>
+                        <input type="file" name="avatar" class="form-control form-control-sm" accept="image/*" required>
+                        <button type="submit" class="btn btn-xs btn-outline-primary mt-1 align-self-start fw-650"
+                            style="padding: 2px 8px; font-size: 0.75rem;">Upload</button>
+                    </form>
+                </div>
+                <div class="col-md-6 d-flex align-items-center">
+                    <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-1 w-100"
+                        data-loading>
+                        <input type="hidden" name="action" value="upload_resume">
+                        <label class="small fw-600 text-muted">
+                            Resume Upload
+                            {% if profile.resume %}
+                            <span class="text-success">(📎 Loaded)</span>
+                            {% endif %}
+                        </label>
+                        <input type="file" name="resume" class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                            required>
+                        <button type="submit" class="btn btn-xs btn-outline-primary mt-1 align-self-start fw-650"
+                            style="padding: 2px 8px; font-size: 0.75rem;">Upload Resume</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Basic Info -->
         <div class="card p-4 mb-4">
             <div class="section-title">Basic Information</div>
             <form method="POST" data-loading>
-                <input type="hidden" name="section" value="basic">
+                <input type="hidden" name="action" value="update_profile">
                 <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label class="form-label">First Name</label>
@@ -105,25 +147,32 @@
                         {% if item.link %}<a href="{{ item.link }}" class="small" target="_blank">{{ item.link |
                             truncate(40) }}</a>{% endif %}
                     </div>
-                    <form method="POST" action="{{ url_for('freelancer.delete_portfolio', item_id=item.id) }}">
-                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    <form method="POST" action="{{ url_for('freelancer.edit_profile') }}" class="d-inline">
+                        <input type="hidden" name="action" value="delete_portfolio">
+                        <input type="hidden" name="portfolio_id" value="{{ item.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger ms-2"><i
+                                class="bi bi-trash"></i></button>
                     </form>
                 </li>
                 {% endfor %}
             </ul>
             {% endif %}
-            <form method="POST" class="row g-2">
-                <input type="hidden" name="section" value="portfolio">
-                <div class="col-md-4">
-                    <input type="text" name="title" class="form-control form-control-sm" placeholder="Project title"
-                        required>
-                </div>
-                <div class="col-md-4">
-                    <input type="url" name="link" class="form-control form-control-sm" placeholder="URL (optional)">
+            <form method="POST" enctype="multipart/form-data" class="row g-2">
+                <input type="hidden" name="action" value="add_portfolio">
+                <div class="col-md-3">
+                    <input type="text" name="portfolio_title" class="form-control form-control-sm"
+                        placeholder="Project title" required>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" name="description" class="form-control form-control-sm"
-                        placeholder="Short description">
+                    <input type="url" name="portfolio_link" class="form-control form-control-sm"
+                        placeholder="URL (optional)">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="portfolio_desc" class="form-control form-control-sm"
+                        placeholder="Description">
+                </div>
+                <div class="col-md-3">
+                    <input type="file" name="portfolio_image" class="form-control form-control-sm" accept="image/*">
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
@@ -144,15 +193,18 @@
                         <div class="text-muted small">{{ e.field_of_study }} &middot; {{ e.start_year }}–{{ e.end_year
                             or 'Present' }}</div>
                     </div>
-                    <form method="POST" action="{{ url_for('freelancer.delete_education', edu_id=e.id) }}">
-                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    <form method="POST" action="{{ url_for('freelancer.edit_profile') }}" class="d-inline">
+                        <input type="hidden" name="action" value="delete_education">
+                        <input type="hidden" name="edu_id" value="{{ e.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger ms-2"><i
+                                class="bi bi-trash"></i></button>
                     </form>
                 </li>
                 {% endfor %}
             </ul>
             {% endif %}
             <form method="POST" class="row g-2">
-                <input type="hidden" name="section" value="education">
+                <input type="hidden" name="action" value="add_education">
                 <div class="col-md-3">
                     <input type="text" name="degree" class="form-control form-control-sm"
                         placeholder="Degree (B.Sc., M.Tech…)" required>
@@ -190,15 +242,18 @@
                         <div class="fw-600">{{ ex.job_title }} at {{ ex.company }}</div>
                         <div class="text-muted small">{{ ex.start_date }} – {{ ex.end_date or 'Present' }}</div>
                     </div>
-                    <form method="POST" action="{{ url_for('freelancer.delete_experience', exp_id=ex.id) }}">
-                        <button class="btn btn-sm btn-outline-danger ms-2"><i class="bi bi-trash"></i></button>
+                    <form method="POST" action="{{ url_for('freelancer.edit_profile') }}" class="d-inline">
+                        <input type="hidden" name="action" value="delete_experience">
+                        <input type="hidden" name="exp_id" value="{{ ex.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger ms-2"><i
+                                class="bi bi-trash"></i></button>
                     </form>
                 </li>
                 {% endfor %}
             </ul>
             {% endif %}
             <form method="POST" class="row g-2">
-                <input type="hidden" name="section" value="experience">
+                <input type="hidden" name="action" value="add_experience">
                 <div class="col-md-3">
                     <input type="text" name="job_title" class="form-control form-control-sm" placeholder="Job title"
                         required>
@@ -224,8 +279,7 @@
         <!-- Password -->
         <div class="card p-4">
             <div class="section-title">Change Password</div>
-            <form method="POST" data-loading>
-                <input type="hidden" name="section" value="password">
+            <form method="POST" action="{{ url_for('auth.change_password') }}" data-loading>
                 <div class="mb-3">
                     <label class="form-label">Current Password</label>
                     <input type="password" name="current_password" class="form-control" required>

@@ -43,6 +43,14 @@ def submit(project_id):
             chunked_files = request.form.getlist('chunked_attachments')
             for filename in chunked_files:
                 if filename:
+                    import os
+                    import shutil
+                    src_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    dest_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'proposal_files')
+                    os.makedirs(dest_dir, exist_ok=True)
+                    dest_path = os.path.join(dest_dir, filename)
+                    if os.path.exists(src_path):
+                        shutil.move(src_path, dest_path)
                     orig_name = filename.split('_', 1)[-1] if '_' in filename else filename
                     ProposalModel.add_file(proposal_id, filename, orig_name)
 

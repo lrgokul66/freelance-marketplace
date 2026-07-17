@@ -122,10 +122,11 @@ class UserModel:
     def update_freelancer_profile(user_id, data):
         execute_query(
             """UPDATE freelancer_profiles
-               SET headline=%s, bio=%s, hourly_rate=%s, availability=%s, languages=%s
+               SET headline=%s, bio=%s, hourly_rate=%s, availability=%s, languages=%s, location=%s, experience_years=%s
                WHERE user_id=%s""",
             (data.get('headline'), data.get('bio'), data.get('hourly_rate'),
-             data.get('availability'), data.get('languages'), user_id),
+             data.get('availability'), data.get('languages'), data.get('location'),
+             data.get('experience_years'), user_id),
             fetch='none', commit=True
         )
         execute_query(

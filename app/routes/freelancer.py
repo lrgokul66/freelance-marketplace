@@ -89,20 +89,15 @@ def edit_profile():
                 'hourly_rate':  request.form.get('hourly_rate', 0) or 0,
                 'availability': request.form.get('availability', 'full_time'),
                 'languages':    request.form.get('languages', '').strip(),
+                'location':     request.form.get('location', '').strip(),
+                'experience_years': request.form.get('experience_years', 0) or 0,
             }
             UserModel.update_freelancer_profile(uid, data)
+            skill_ids = [int(s) for s in request.form.getlist('skills') if s.isdigit()]
+            UserModel.set_freelancer_skills(fp_id, skill_ids)
             session['first_name'] = data['first_name']
             session['last_name']  = data['last_name']
             flash('Profile updated.', 'success')
-
-        elif action == 'update_skills':
-            skill_ids = [int(s) for s in request.form.getlist('skills') if s.isdigit()]
-            new_skill = request.form.get('new_skill', '').strip()
-            if new_skill:
-                sid = UserModel.get_or_create_skill(new_skill)
-                skill_ids.append(sid)
-            UserModel.set_freelancer_skills(fp_id, skill_ids)
-            flash('Skills updated.', 'success')
 
         elif action == 'upload_avatar':
             f = request.files.get('avatar')

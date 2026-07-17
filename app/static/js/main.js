@@ -162,16 +162,17 @@ document.querySelectorAll('.custom-file-input-label').forEach(function (label) {
         if (msg.file_path) {
             const ext = msg.file_path.split('.').pop().toLowerCase();
             const isImg = ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext);
+            const linkColor = isMine ? '#58a6ff' : '#3b82f6';
             body += isImg
                 ? `<img src="/static/uploads/chat_files/${escapeHtml(msg.file_path)}" class="img-fluid rounded mt-1" style="max-width:200px;">`
-                : `<a href="/static/uploads/chat_files/${escapeHtml(msg.file_path)}" class="text-white d-block mt-1" target="_blank">
+                : `<a href="/static/uploads/chat_files/${escapeHtml(msg.file_path)}" class="d-block mt-1" style="color: ${linkColor}; text-decoration: underline; font-weight: 600;" target="_blank">
              <i class="bi bi-paperclip"></i> ${escapeHtml(msg.file_name || msg.file_path)}
            </a>`;
         }
         return `<div class="d-flex ${isMine ? 'justify-content-end' : ''} fade-in">
       <div class="chat-bubble ${cls}">
         ${body}
-        <div class="chat-meta">${msg.first_name} • ${msg.created_at}</div>
+        <div class="chat-meta">${msg.created_at}</div>
       </div>
     </div>`;
     }

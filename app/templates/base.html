@@ -100,9 +100,15 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
               data-bs-toggle="dropdown">
+              {% set av_filename = get_user_avatar(session.user_id, session.role) %}
+              {% if av_filename %}
+              <img src="{{ url_for('static', filename='uploads/avatars/' + av_filename) }}" class="avatar"
+                style="width:34px;height:34px;border-radius:50%;object-fit:cover;">
+              {% else %}
               <div class="avatar-placeholder" style="width:34px;height:34px;font-size:.85rem;">
                 {{ session.first_name[0] | upper }}{{ session.last_name[0] | upper }}
               </div>
+              {% endif %}
               <span class="d-none d-md-inline fw-600">{{ session.first_name }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow"

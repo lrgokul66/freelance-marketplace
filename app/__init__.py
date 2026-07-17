@@ -85,4 +85,21 @@ def create_app():
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
 
+    # ── Context Processor for User Avatar ──────────────────
+    @app.context_processor
+    def inject_user_avatar():
+        def get_user_avatar(user_id, role):
+            if not user_id or not role:
+                return None
+            try:
+                from app.models.user import UserModel
+                if role == 'client':
+                    profile = UserModel.get_client_profile(user_id)
+                else:
+                    profile = UserModel.get_freelancer_profile(user_id)
+                return profile.get('avatar') if profile else None
+            except Exception:
+                return None
+        return dict(get_user_avatar=get_user_avatar)
+
     return app

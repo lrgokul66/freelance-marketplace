@@ -15,6 +15,29 @@
 <div class="row justify-content-center">
     <div class="col-lg-7">
         <h1 class="page-title mb-4">Account Settings</h1>
+        <!-- Profile Picture Card -->
+        <div class="card p-4 mb-4 text-center">
+            <div class="section-title text-start">Profile Picture</div>
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                {% set av_filename = get_user_avatar(session.user_id, session.role) %}
+                {% if av_filename %}
+                <img src="{{ url_for('static', filename='uploads/avatars/' + av_filename) }}" class="avatar"
+                    style="width:100px;height:100px;border-radius:50%;object-fit:cover;">
+                {% else %}
+                <div class="avatar-placeholder"
+                    style="width:100px;height:100px;font-size:2rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg-input);color:var(--text-muted);font-weight:700;">
+                    {{ profile.first_name[0]|upper }}{{ profile.last_name[0]|upper }}
+                </div>
+                {% endif %}
+                <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-2 align-items-start"
+                    data-loading>
+                    <input type="hidden" name="action" value="upload_avatar">
+                    <input type="file" name="avatar" class="form-control form-control-sm" accept="image/*" required>
+                    <button type="submit" class="btn btn-sm btn-outline-primary fw-600">Upload Picture</button>
+                </form>
+            </div>
+        </div>
+
         <!-- Profile Info -->
         <div class="card p-4 mb-4">
             <div class="section-title">Personal Information</div>
@@ -50,8 +73,7 @@
         <!-- Change Password -->
         <div class="card p-4">
             <div class="section-title">Change Password</div>
-            <form method="POST" data-loading>
-                <input type="hidden" name="action" value="change_password">
+            <form method="POST" action="{{ url_for('auth.change_password') }}" data-loading>
                 <div class="mb-3">
                     <label class="form-label">Current Password</label>
                     <input type="password" name="current_password" class="form-control" required>
