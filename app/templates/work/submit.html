@@ -18,7 +18,14 @@
                         <div class="small text-muted mt-1">ZIP, PDF, images, docs — max 50MB</div>
                         <input type="file" name="work_file" id="workFileInput" class="d-none" required>
                     </div>
-                    <div id="workFileName" class="text-muted small mt-2"></div>
+                    <div id="workFileName"
+                        class="text-muted small mt-2 d-flex justify-content-between align-items-center">
+                        <span id="workFileNameLabel"></span>
+                        <button type="button" class="btn btn-sm btn-outline-danger d-none" id="removeWorkFileBtn"
+                            style="padding: 2px 6px; font-size: 0.75rem;">
+                            <i class="bi bi-x-circle me-1"></i>Deselect
+                        </button>
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Notes for Client <span class="text-muted small">(optional)</span></label>
@@ -35,9 +42,28 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-    document.getElementById('workFileInput').addEventListener('change', function () {
-        document.getElementById('workFileName').textContent = this.files[0] ? '📎 ' + this.files[0].name : '';
+    const fileInput = document.getElementById('workFileInput');
+    const nameLabel = document.getElementById('workFileNameLabel');
+    const removeBtn = document.getElementById('removeWorkFileBtn');
+
+    function updateFileDisplay() {
+        if (fileInput.files && fileInput.files[0]) {
+            nameLabel.textContent = '📎 ' + fileInput.files[0].name;
+            removeBtn.classList.remove('d-none');
+        } else {
+            nameLabel.textContent = '';
+            removeBtn.classList.add('d-none');
+        }
+    }
+
+    fileInput.addEventListener('change', updateFileDisplay);
+
+    removeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        fileInput.value = "";
+        updateFileDisplay();
     });
+
     // Drag & drop
     const dz = document.querySelector('.drop-zone');
     dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('active'); });
@@ -45,8 +71,8 @@
     dz.addEventListener('drop', e => {
         e.preventDefault();
         dz.classList.remove('active');
-        document.getElementById('workFileInput').files = e.dataTransfer.files;
-        document.getElementById('workFileName').textContent = e.dataTransfer.files[0]?.name || '';
+        fileInput.files = e.dataTransfer.files;
+        updateFileDisplay();
     });
 </script>
 {% endblock %}

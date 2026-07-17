@@ -72,17 +72,39 @@
                 <i class="bi bi-send-fill"></i>
             </button>
         </form>
-        <div id="fileNameDisplay" class="text-muted small mt-1"></div>
+        <div id="fileNameDisplay" class="text-muted small mt-1 d-flex justify-content-between align-items-center">
+            <span id="chatFileNameLabel"></span>
+            <button type="button" class="btn btn-sm btn-outline-danger d-none" id="removeChatFileBtn"
+                style="padding: 1px 5px; font-size: 0.7rem;">
+                <i class="bi bi-x-circle me-1"></i>Remove
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-    // Show file name on select
-    document.querySelector('input[name="file"]').addEventListener('change', function () {
-        document.getElementById('fileNameDisplay').textContent =
-            this.files[0] ? '📎 ' + this.files[0].name : '';
+    const chatFileInput = document.querySelector('input[name="file"]');
+    const chatNameLabel = document.getElementById('chatFileNameLabel');
+    const chatRemoveBtn = document.getElementById('removeChatFileBtn');
+
+    function updateChatFileDisplay() {
+        if (chatFileInput.files && chatFileInput.files[0]) {
+            chatNameLabel.textContent = '📎 ' + chatFileInput.files[0].name;
+            chatRemoveBtn.classList.remove('d-none');
+        } else {
+            chatNameLabel.textContent = '';
+            chatRemoveBtn.classList.add('d-none');
+        }
+    }
+
+    chatFileInput.addEventListener('change', updateChatFileDisplay);
+    chatRemoveBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        chatFileInput.value = "";
+        updateChatFileDisplay();
     });
+
     // Send on Ctrl+Enter
     document.getElementById('chatInput').addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); document.getElementById('chatSendForm').submit(); }

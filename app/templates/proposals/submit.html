@@ -54,6 +54,10 @@
                     <label class="form-label">Attachments <span class="text-muted small">(optional, up to 1GB using
                             Chunked Upload)</span></label>
                     <input type="file" id="proposalAttachmentInput" class="form-control" name="attachments_direct">
+                    <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-none"
+                        id="removeProposalAttachmentBtn">
+                        <i class="bi bi-trash me-1"></i>Remove File
+                    </button>
 
                     <!-- Progress bar -->
                     <div class="progress mt-2 d-none" id="proposalAttachmentProgressContainer" style="height: 20px;">
@@ -81,6 +85,7 @@
         const progressContainer = document.getElementById('proposalAttachmentProgressContainer');
         const progressBar = document.getElementById('proposalAttachmentProgressBar');
         const submitBtn = document.getElementById('submitProposalBtn');
+        const removeBtn = document.getElementById('removeProposalAttachmentBtn');
 
         if (fileInput && window.initChunkedUpload) {
             window.initChunkedUpload(
@@ -91,6 +96,35 @@
                 'submitProposalBtn'
             );
         }
+
+        // Show/hide remove button and handle click
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                removeBtn.classList.remove('d-none');
+            } else {
+                removeBtn.classList.add('d-none');
+            }
+        });
+
+        // Watch for when chunked upload adds files too
+        const observer = new MutationObserver(function () {
+            if (container.children.length > 0 || fileInput.files.length > 0) {
+                removeBtn.classList.remove('d-none');
+            } else {
+                removeBtn.classList.add('d-none');
+            }
+        });
+        observer.observe(container, { childList: true });
+
+        removeBtn.addEventListener('click', function () {
+            fileInput.value = "";
+            container.innerHTML = "";
+            progressContainer.classList.add('d-none');
+            progressBar.style.width = "0%";
+            progressBar.textContent = "0%";
+            removeBtn.classList.add('d-none');
+            if (submitBtn) submitBtn.disabled = false;
+        });
     });
 </script>
 {% endblock %}
