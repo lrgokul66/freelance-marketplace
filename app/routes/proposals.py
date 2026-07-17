@@ -39,7 +39,14 @@ def submit(project_id):
         try:
             proposal_id = ProposalModel.create(project_id, session['user_id'], data)
 
-            # Handle attachments
+            # Handle chunked uploads
+            chunked_files = request.form.getlist('chunked_attachments')
+            for filename in chunked_files:
+                if filename:
+                    orig_name = filename.split('_', 1)[-1] if '_' in filename else filename
+                    ProposalModel.add_file(proposal_id, filename, orig_name)
+
+            # Handle standard attachments (fallback)
             files = request.files.getlist('attachments')
             for f in files:
                 if f and f.filename:

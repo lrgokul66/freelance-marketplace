@@ -51,15 +51,47 @@
                         placeholder="https://github.com/you&#10;https://portfolio.example.com"></textarea>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Attachments <span class="text-muted small">(optional, up to 5
-                            files)</span></label>
-                    <input type="file" name="attachments" class="form-control" multiple accept="*/*">
+                    <label class="form-label">Attachments <span class="text-muted small">(optional, up to 1GB using
+                            Chunked Upload)</span></label>
+                    <input type="file" id="proposalAttachmentInput" class="form-control" name="attachments_direct">
+
+                    <!-- Progress bar -->
+                    <div class="progress mt-2 d-none" id="proposalAttachmentProgressContainer" style="height: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                            id="proposalAttachmentProgressBar" style="width: 0%;">0%</div>
+                    </div>
+
+                    <!-- Hidden fields container for chunked uploads -->
+                    <div id="chunkedAttachmentsContainer"></div>
+                    <div class="form-text">For files > 16MB, they will automatically be uploaded in 5MB slices.</div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+                <button type="submit" id="submitProposalBtn" class="btn btn-primary w-100 py-2 fw-600">
                     <i class="bi bi-send me-2"></i>Submit Proposal
                 </button>
             </form>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('proposalAttachmentInput');
+        const container = document.getElementById('chunkedAttachmentsContainer');
+        const progressContainer = document.getElementById('proposalAttachmentProgressContainer');
+        const progressBar = document.getElementById('proposalAttachmentProgressBar');
+        const submitBtn = document.getElementById('submitProposalBtn');
+
+        if (fileInput && window.initChunkedUpload) {
+            window.initChunkedUpload(
+                'proposalAttachmentInput',
+                'proposalAttachmentProgressContainer',
+                'proposalAttachmentProgressBar',
+                'chunkedAttachmentsContainer', // stores name="chunked_attachments" hidden fields
+                'submitProposalBtn'
+            );
+        }
+    });
+</script>
+{% endblock %}
 {% endblock %}

@@ -143,7 +143,15 @@ def create_project():
                 final_skill_ids.append(sid)
             ProjectModel.set_project_skills(project_id, final_skill_ids)
 
-            # Handle file attachments
+            # Handle chunked uploads
+            chunked_files = request.form.getlist('chunked_attachments')
+            for filename in chunked_files:
+                if filename:
+                    # Extract original name (everything after UUID)
+                    orig_name = filename.split('_', 1)[-1] if '_' in filename else filename
+                    ProjectModel.add_file(project_id, filename, orig_name)
+
+            # Handle standard file attachments (fallback)
             files = request.files.getlist('attachments')
             for f in files:
                 if f and f.filename:

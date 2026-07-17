@@ -35,6 +35,7 @@ def create_app():
     from app.routes.notifications import notifications_bp
     from app.routes.work          import work_bp
     from app.routes.main          import main_bp
+    from app.routes.upload        import upload_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp,          url_prefix='/auth')
@@ -47,6 +48,8 @@ def create_app():
     app.register_blueprint(reviews_bp,       url_prefix='/reviews')
     app.register_blueprint(notifications_bp, url_prefix='/notifications')
     app.register_blueprint(work_bp,          url_prefix='/work')
+    app.register_blueprint(upload_bp,        url_prefix='/upload')
+
 
     # ── Custom error handlers ───────────────────────────────
     @app.errorhandler(403)

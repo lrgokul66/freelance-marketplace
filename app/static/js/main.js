@@ -315,3 +315,86 @@ document.querySelectorAll('.custom-file-input-label').forEach(function (label) {
     }
 })();
 
+/* ── Chunked File Upload Helper ───────────────────────────── */
+window.initChunkedUpload = function (fileInputId, progressContainerId, progressBarId, hiddenInputId, submitButtonId) {
+    const fileInput = document.getElementById(fileInputId);
+    const progressContainer = document.getElementById(progressContainerId);
+    const progressBar = document.getElementById(progressBarId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const submitButton = submitButtonId ? document.getElementById(submitButtonId) : null;
+
+    if (!fileInput || !progressContainer || !progressBar || !hiddenInput) {
+        console.warn('initChunkedUpload: Missing HTML elements', { fileInputId, progressContainerId, progressBarId, hiddenInputId });
+        return;
+    }
+
+    const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks
+
+    fileInput.addEventListener('change', async function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Disable submit button during upload
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+
+        const fileIdentifier = 'upload_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+        progressContainer.classList.remove('d-none');
+        progressBar.style.width = '0%';
+        progressBar.classList.remove('bg-success', 'bg-danger');
+        progressBar.textContent = 'Preparing upload...';
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunkBlob = file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('file', chunkBlob);
+            formData.append('chunkIndex', chunkIndex);
+            formData.append('totalChunks', totalChunks);
+            formData.append('fileIdentifier', fileIdentifier);
+            formData.append('filename', file.name);
+
+            try {
+                const response = await fetch('/upload/upload-chunk', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const percentComplete = Math.round(((chunkIndex + 1) / totalChunks) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressBar.textContent = percentComplete + '%';
+
+                if (data.status === 'completed') {
+                    progressBar.classList.add('bg-success');
+                    progressBar.textContent = 'Upload Complete!';
+                    hiddenInput.value = data.filename;
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    break;
+                }
+            } catch (error) {
+                console.error('Error uploading chunk:', chunkIndex, error);
+                progressBar.classList.add('bg-danger');
+                progressBar.textContent = 'Upload Failed! Please try again.';
+                fileInput.value = ''; // Clean up input
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
+                break;
+            }
+        }
+    });
+};
+
+
