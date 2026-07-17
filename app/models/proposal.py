@@ -129,6 +129,6 @@ class ProposalModel:
     @staticmethod
     def get_files(proposal_id):
         return execute_query(
-            "SELECT * FROM proposal_files WHERE proposal_id=%s",
+            "SELECT id, proposal_id, filename, filename AS file_path, original_name FROM proposal_files WHERE proposal_id=%s",
             (proposal_id,), fetch='all'
         )

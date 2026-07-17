@@ -53,7 +53,9 @@ class ProjectModel:
     def get_by_id(project_id):
         return execute_query(
             """SELECT p.*, u.first_name, u.last_name,
-                      cp.company, cp.avatar AS client_avatar, cp.location
+                       u.first_name AS client_first, u.last_name AS client_last,
+                       u.created_at AS client_joined,
+                       cp.company, cp.avatar AS client_avatar, cp.location
                FROM projects p
                JOIN users u ON u.id=p.client_id
                LEFT JOIN client_profiles cp ON cp.user_id=p.client_id
@@ -112,7 +114,7 @@ class ProjectModel:
     @staticmethod
     def get_files(project_id):
         return execute_query(
-            "SELECT * FROM project_files WHERE project_id=%s",
+            "SELECT id, project_id, filename, filename AS file_path, original_name FROM project_files WHERE project_id=%s",
             (project_id,), fetch='all'
         )
 
