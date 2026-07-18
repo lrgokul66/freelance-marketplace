@@ -15,9 +15,8 @@
     {% if notifications %}
     <ul class="list-group list-group-flush">
         {% for n in notifications %}
-        <li class="list-group-item d-flex align-items-start gap-3 py-3
-               {{ '' if n.is_read else 'fw-600' }}" style="background:{{ 'rgba(99,102,241,.05)' if not n.is_read else 'transparent' }};
-               border-color:var(--border);">
+        <li
+            class="list-group-item d-flex align-items-start gap-3 py-3 notification-item {{ 'unread' if not n.is_read else '' }}">
             <div class="mt-1">
                 {% if n.type == 'new_proposal' %}
                 <i class="bi bi-file-earmark-text-fill text-primary fs-5"></i>

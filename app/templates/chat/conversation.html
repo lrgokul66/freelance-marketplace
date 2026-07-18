@@ -41,9 +41,8 @@
                 <img src="{{ url_for('static', filename='uploads/chat_files/'+m.file_path) }}"
                     class="img-fluid rounded mt-1" style="max-width:200px;">
                 {% else %}
-                <a href="{{ url_for('static', filename='uploads/chat_files/'+m.file_path) }}" class="d-block mt-1"
-                    style="color: {{ '#3b82f6' if m.sender_id != session.user_id else '#58a6ff' }}; text-decoration: underline; font-weight: 600;"
-                    target="_blank">
+                <a href="{{ url_for('static', filename='uploads/chat_files/'+m.file_path) }}"
+                    class="chat-attachment-link d-block mt-1" target="_blank">
                     <i class="bi bi-paperclip me-1"></i>{{ m.file_name or m.file_path }}
                 </a>
                 {% endif %}

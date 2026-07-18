@@ -146,6 +146,18 @@ a:hover {
   padding: 0 4px;
 }
 
+/* ── Notifications ────────────────────────────────────────── */
+.notification-item {
+  border-color: var(--border) !important;
+  background: transparent;
+}
+
+.notification-item.unread {
+  background: rgba(99, 102, 241, .05);
+  font-weight: 600;
+}
+
+
 /* ── Theme Toggle ───────────────────────────────────────────── */
 #themeToggle {
   background: none;
@@ -637,6 +649,22 @@ a:hover {
   margin-top: .25rem;
   align-self: flex-end;
 }
+
+.chat-attachment-link {
+  display: block;
+  margin-top: 0.25rem;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.chat-bubble.sent .chat-attachment-link {
+  color: #58a6ff;
+}
+
+.chat-bubble.received .chat-attachment-link {
+  color: #3b82f6;
+}
+
 
 .chat-input-area {
   border-top: 1px solid var(--border);
