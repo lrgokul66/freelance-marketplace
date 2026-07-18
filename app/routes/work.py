@@ -95,7 +95,7 @@ def review_submission(submission_id):
     title, msg = notif_messages[status]
     NotificationModel.create(
         submission['freelancer_id'], 'work_reviewed', title, msg,
-        link=url_for('client.view_project', project_id=project['id'])
+        link=url_for('projects.detail', project_id=project['id'])
     )
 
     flash(f'Work {status.replace("_", " ")}.', 'success')

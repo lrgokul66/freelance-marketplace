@@ -22,13 +22,13 @@
                     <label class="form-label" for="delete_confirm_input">
                         Type <strong class="text-danger">DELETE</strong> to confirm
                     </label>
-                    <input type="text" class="form-control border-danger" id="delete_confirm_input" placeholder="DELETE"
-                        autocomplete="off">
+                    <input type="text" class="form-control border-danger" id="delete_confirm_input"
+                        name="delete_confirm" placeholder="DELETE" autocomplete="off" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="delete_password_input">Current Password</label>
-                    <input type="password" class="form-control border-danger" id="delete_password_input" name="password"
-                        required>
+                    <input type="password" class="form-control border-danger" id="delete_password_input"
+                        name="confirm_password" required>
                 </div>
                 <div class="d-flex gap-3">
                     <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary flex-fill">

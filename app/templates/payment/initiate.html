@@ -84,30 +84,30 @@
         const resp = await fetch("{{ url_for('payment.create_order') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ project_id: {{ project.id }}, amount: parseInt(amount) })
-  });
-    const data = await resp.json();
-    if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = '⚡ Pay Securely'; return; }
+            body: JSON.stringify({ project_id: Number("{{ project.id }}"), amount: parseFloat(amount) })
+        });
+        const data = await resp.json();
+        if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = '⚡ Pay Securely'; return; }
 
-    const opts = {
-        key: "{{ razorpay_key_id }}",
-        amount: data.amount,
-        currency: "INR",
-        order_id: data.order_id,
-        name: "FreelanceHub",
-        description: "{{ project.title | truncate(40) }}",
-        handler: function (response) {
-            document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
-            document.getElementById('rzp_order_id').value = response.razorpay_order_id;
-            document.getElementById('rzp_signature').value = response.razorpay_signature;
-            document.getElementById('rzp_payment_db_id').value = data.payment_db_id;
-            document.getElementById('rzpSuccessForm').submit();
-        },
-        prefill: { name: "{{ session.get('full_name','') }}", email: "{{ session.get('email','') }}" },
-        theme: { color: "#6366f1" }
-    };
-    (new Razorpay(opts)).open();
-    btn.disabled = false; btn.textContent = '⚡ Pay Securely via Razorpay';
-});
+        const opts = {
+            key: "{{ razorpay_key_id }}",
+            amount: data.amount,
+            currency: "INR",
+            order_id: data.order_id,
+            name: "FreelanceHub",
+            description: "{{ project.title | truncate(40) }}",
+            handler: function (response) {
+                document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+                document.getElementById('rzp_signature').value = response.razorpay_signature;
+                document.getElementById('rzp_payment_db_id').value = data.payment_db_id;
+                document.getElementById('rzpSuccessForm').submit();
+            },
+            prefill: { name: "{{ session.get('full_name','') }}", email: "{{ session.get('email','') }}" },
+            theme: { color: "#6366f1" }
+        };
+        (new Razorpay(opts)).open();
+        btn.disabled = false; btn.textContent = '⚡ Pay Securely via Razorpay';
+    });
 </script>
 {% endblock %}

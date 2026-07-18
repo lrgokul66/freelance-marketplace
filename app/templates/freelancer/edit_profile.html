@@ -190,8 +190,8 @@
                     style="background:transparent;border-color:var(--border);">
                     <div>
                         <div class="fw-600">{{ e.degree }} — {{ e.institution }}</div>
-                        <div class="text-muted small">{{ e.field_of_study }} &middot; {{ e.start_year }}–{{ e.end_year
-                            or 'Present' }}</div>
+                        <div class="text-muted small">Graduation Year: {{ e.year }}{% if e.description %} &middot; {{
+                            e.description }}{% endif %}</div>
                     </div>
                     <form method="POST" action="{{ url_for('freelancer.edit_profile') }}" class="d-inline">
                         <input type="hidden" name="action" value="delete_education">
@@ -214,15 +214,12 @@
                         required>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" name="field_of_study" class="form-control form-control-sm"
-                        placeholder="Field of study">
+                    <input type="text" name="edu_desc" class="form-control form-control-sm"
+                        placeholder="Description (Field of study)">
                 </div>
-                <div class="col-md-1">
-                    <input type="number" name="start_year" class="form-control form-control-sm" placeholder="From"
+                <div class="col-md-2">
+                    <input type="number" name="edu_year" class="form-control form-control-sm" placeholder="Year"
                         min="1970" max="2030">
-                </div>
-                <div class="col-md-1">
-                    <input type="number" name="end_year" class="form-control form-control-sm" placeholder="To">
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
@@ -239,8 +236,9 @@
                 <li class="list-group-item d-flex justify-content-between"
                     style="background:transparent;border-color:var(--border);">
                     <div>
-                        <div class="fw-600">{{ ex.job_title }} at {{ ex.company }}</div>
-                        <div class="text-muted small">{{ ex.start_date }} – {{ ex.end_date or 'Present' }}</div>
+                        <div class="fw-600">{{ ex.title }} at {{ ex.company }}</div>
+                        <div class="text-muted small">Duration: {{ ex.years }}{% if ex.description %} &middot; {{
+                            ex.description }}{% endif %}</div>
                     </div>
                     <form method="POST" action="{{ url_for('freelancer.edit_profile') }}" class="d-inline">
                         <input type="hidden" name="action" value="delete_experience">
@@ -255,20 +253,20 @@
             <form method="POST" class="row g-2">
                 <input type="hidden" name="action" value="add_experience">
                 <div class="col-md-3">
-                    <input type="text" name="job_title" class="form-control form-control-sm" placeholder="Job title"
+                    <input type="text" name="exp_title" class="form-control form-control-sm" placeholder="Job title"
                         required>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" name="company" class="form-control form-control-sm" placeholder="Company"
+                    <input type="text" name="exp_company" class="form-control form-control-sm" placeholder="Company"
                         required>
                 </div>
-                <div class="col-md-2">
-                    <input type="text" name="start_date" class="form-control form-control-sm"
-                        placeholder="Start (YYYY-MM)">
+                <div class="col-md-3">
+                    <input type="text" name="exp_years" class="form-control form-control-sm"
+                        placeholder="Years/Dates (e.g. 2021-2023)" required>
                 </div>
                 <div class="col-md-2">
-                    <input type="text" name="end_date" class="form-control form-control-sm"
-                        placeholder="End (blank=now)">
+                    <input type="text" name="exp_desc" class="form-control form-control-sm"
+                        placeholder="Role description">
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-plus"></i></button>
