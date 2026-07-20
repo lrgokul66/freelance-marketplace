@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreelanceHub Presentation - Slide Deck</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-base: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, var(--primary), var(--primary-light));
+            --gradient-accent: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        [data-theme="light"] {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #6366f1;
+            --secondary: #059669;
+            --accent: #d97706;
+            --danger: #dc2626;
+            --bg-base: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #627d98;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Presentation Workspace Grid */
+        .workspace {
+            flex: 1;
+            display: flex;
+            position: relative;
+            height: calc(100vh - 70px);
+        }
+
+        /* Sidebar navigation */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        /* Scrollbar styles */
+        .slide-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .slide-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .slide-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .slide-item {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 550;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .slide-item:hover {
+            background-color: rgba(99, 102, 241, 0.08);
+            color: var(--primary-light);
+        }
+
+        .slide-item.active {
+            background-color: rgba(99, 102, 241, 0.15);
+            color: var(--text-main);
+            border-color: rgba(99, 102, 241, 0.3);
+            font-weight: 600;
+        }
+
+        .slide-item.active i {
+            color: var(--primary-light);
+        }
+
+        /* Slide Container */
+        .slide-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        /* Slides styling */
+        .slide {
+            position: absolute;
+            width: calc(100% - 6rem);
+            height: calc(100% - 6rem);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        /* Slide Headers */
+        .slide-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1.25rem;
+        }
+
+        .slide-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .slide-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .slide-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .slide-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 550;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Slide Content Area */
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Grid setups for internal slide contents */
+        .slide-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            height: 100%;
+        }
+
+        .slide-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        /* Typography & elements inside slides */
+        p.lead {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        ul.points-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        ul.points-list li {
+            position: relative;
+            padding-left: 2rem;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        ul.points-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .feature-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .feature-card-header i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .feature-card-body {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Title Slide Custom Layout */
+        .title-slide-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .main-gradient-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .title-slide-subtitle {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 2.5rem;
+        }
+
+        .title-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .meta-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .meta-col h6 {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+        }
+
+        .meta-col p {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        /* Database table badge styling */
+        .db-badge {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Architecture Visual */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background-color: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            width: 160px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .flow-node i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--secondary);
+            animation: bounceRight 1.5s infinite;
+        }
+
+        @keyframes bounceRight {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(8px);
+            }
+        }
+
+        /* Presenter Controls Footer */
+        .presenter-controls {
+            height: 70px;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 10;
+        }
+
+        .control-btns {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-light);
+        }
+
+        .slide-progress {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Speaker notes sidebar / modal styling */
+        .notes-panel {
+            background-color: rgba(99, 102, 241, 0.05);
+            border: 1px dashed rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .notes-panel h6 {
+            color: var(--secondary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notes-panel p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        /* Dynamic Decorative background shapes */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background-color: var(--primary);
+            top: 10%;
+            left: 20%;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background-color: var(--secondary);
+            bottom: 10%;
+            right: 15%;
+        }
+
+        /* Code highlight inside presentation */
+        pre {
+            background-color: var(--bg-base);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            color: #d1d5db;
+        }
+
+        .highlight-keyword {
+            color: #f472b6;
+        }
+
+        .highlight-string {
+            color: #34d399;
+        }
+
+        .highlight-variable {
+            color: #818cf8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Blur background shapes -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="workspace">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <i class="bi bi-rocket-takeoff-fill"></i>
+                <span>FreelanceHub</span>
+            </div>
+            <ul class="slide-list" id="slideList">
+                <!-- Javascript will populate this -->
+            </ul>
+        </aside>
+
+        <!-- Slides Container -->
+        <main class="slide-container" id="slideContainer">
+
+            <!-- Slide 1: Welcome -->
+            <section class="slide active" data-slide-id="0" data-title="Title Slide">
+                <div class="title-slide-layout">
+                    <h1 class="main-gradient-title">FreelanceHub</h1>
+                    <h2 class="title-slide-subtitle">A Secure, Modern Freelance Marketplace Platform</h2>
+                    <p class="lead" style="max-width: 600px;">Developed under clean design principles and an optimized
+                        3-Tier Web Architecture using Python, Flask & MySQL</p>
+
+                    <div class="title-meta-grid">
+                        <div class="meta-col">
+                            <h6>Created By</h6>
+                            <p id="presenterName">Development Team</p>
+                        </div>
+                        <div class="meta-col">
+                            <h6>Technology Core</h6>
+                            <p>Flask / MySQL / Bootstrap 5</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: Problem Statement -->
+            <section class="slide" data-slide-id="1" data-title="Problem & Solution">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-exclamation-triangle-fill slide-icon"></i>
+                        <h2 class="slide-title">The Domain Challenge</h2>
+                    </div>
+                    <span class="slide-subtitle">Background</span>
+                </div>
+                <div class="slide-content">
+                    <div class="slide-grid-2">
+                        <div>
+                            <h4 style="margin-bottom: 1rem; color: var(--danger);"><i
+                                    class="bi bi-x-circle-fill me-2"></i>The Industry Problems</h4>
+                            <ul class="points-list">
+                                <li><strong>Payment Friction:</strong> Lack of verifiable transparent payouts and
+                                    invoice management systems.</li>
+                                <li><strong>Isolation:</strong> Communication is dispersed among unsafe, fragmented
+                                    channels.</li>
+                                <li><strong>Validation Warnings:</strong> Linter & code formatting errors created by
+                                    malformed inline scripting templates.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 1rem; color: var(--secondary);"><i
+                                    class="bi bi-check-circle-fill me-2"></i>Our Solutions</h4>
+                            <ul class="points-list">
+                                <li><strong>Integrated Gateways:</strong> Validated webhook triggers backing dynamic
+                                    secure transaction verification.</li>
+                                <li><strong>Unified Workspace:</strong> Encrypted project channels containing polling
+                                    chat and attachment features.</li>
+                                <li><strong>Separation of Concerns:</strong> Static markup pages fully decoupled from
+                                    core CSS variables.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="notes-panel">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Discuss the problems freelance teams encounter including payout safety. Mention how we
+                            structured code components to avoid layout lints and runtime errors.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Scope & Objectives -->
+            <section class="slide" data-slide-id="2" data-title="Objectives">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-bullseye slide-icon"></i>
+                        <h2 class="slide-title">Project Objectives</h2>
+                    </div>
+                    <span class="slide-subtitle">Scope</span>
+                </div>
+                <div class="slide-content">
+                    <div class="slide-grid-3">
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Security First</span>
+                            </div>
+                            <div class="feature-card-body">
+                                Enforce parameter checks, password Bcrypt transforms, UUID-named upload storage, and
+                                strict verification logic.
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-palette"></i>
+                                <span>Design Aesthetics</span>
+                            </div>
+                            <div class="feature-card-body">
+                                Fully responsive light/dark design system mapped, utilizing LocalStorage for user
+                                preferences.
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-cash-stack"></i>
+                                <span>Billing Integrity</span>
+                            </div>
+                            <div class="feature-card-body">
+                                Integrate payments, verify secure callback signatures, and download dynamically
+                                generated PDF invoices.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notes-panel">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Explain how we prioritised system security, dark mode configuration persistence, and payment
+                            authentication rather than just building simple CRUD screens.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Tech Stack -->
+            <section class="slide" data-slide-id="3" data-title="Architecture & Stack">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-layers-half slide-icon"></i>
+                        <h2 class="slide-title">System Architecture</h2>
+                    </div>
+                    <span class="slide-subtitle">Tech Stack</span>
+                </div>
+                <div class="slide-content">
+                    <div class="flow-container">
+                        <div class="flow-node">
+                            <i class="bi bi-laptop"></i>
+                            <strong>Client UI</strong>
+                            <span class="text-muted small">Bootstrap 5, Custom CSS Variables, ES6 JS</span>
+                        </div>
+                        <div class="flow-arrow"><i class="bi bi-arrow-right"></i></div>
+                        <div class="flow-node">
+                            <i class="bi bi-cpu"></i>
+                            <strong>Backend Engine</strong>
+                            <span class="text-muted small">Flask Application Server (Blueprints Architecture)</span>
+                        </div>
+                        <div class="flow-arrow"><i class="bi bi-arrow-right"></i></div>
+                        <div class="flow-node">
+                            <i class="bi bi-database"></i>
+                            <strong>Data Store</strong>
+                            <span class="text-muted small">MySQL Relational DB (3NF Normalized)</span>
+                        </div>
+                    </div>
+                    <div class="notes-panel" style="margin-top: 1rem;">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Explain the architecture components: user actions trigger requests handled by Flask route
+                            controller blueprints, saving state into normalized MySQL tables.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Database Entities -->
+            <section class="slide" data-slide-id="4" data-title="Database Schema">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-database-fill-gear slide-icon"></i>
+                        <h2 class="slide-title">Database Models (3NF)</h2>
+                    </div>
+                    <span class="slide-subtitle">MySQL Schema</span>
+                </div>
+                <div class="slide-content">
+                    <p class="lead" style="margin-bottom: 1rem;">The system is structured under a strict relational
+                        constraints architecture:</p>
+                    <div class="slide-grid-3">
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Users & Roles</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <span class="db-badge">users</span> <span class="db-badge">freelancer_profiles</span>
+                                <div class="mt-2 text-muted x-small">Stores Bcrypt password hashes, resume paths, skills
+                                    array, and experience data.</div>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-briefcase-fill"></i>
+                                <span>Contracts & Bids</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <span class="db-badge">projects</span> <span class="db-badge">proposals</span>
+                                <div class="mt-2 text-muted x-small">Fulfills the project lifecycle and handles status
+                                    comparisons (Hired, Rejected, Closed).</div>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-wallet2"></i>
+                                <span>Payments & Chats</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <span class="db-badge">payments</span> <span class="db-badge">messages</span>
+                                <div class="mt-2 text-muted x-small">Binds transactions and stores conversational chat
+                                    data with uploaded files details.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notes-panel" style="margin-top: 1rem;">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Highlight relational database consistency constraints. Explain the role separation where
+                            users link dynamically to client profiles or freelancer skill sheets.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Flow Demonstration -->
+            <section class="slide" data-slide-id="5" data-title="Core Workflows">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-diagram-3-fill slide-icon"></i>
+                        <h2 class="slide-title">System Workflows</h2>
+                    </div>
+                    <span class="slide-subtitle">Sequence</span>
+                </div>
+                <div class="slide-content">
+                    <ul class="points-list" style="gap: 0.8rem;">
+                        <li><strong>1. Creation:</strong> Client posts a project listing detailing budget, skills
+                            constraints, and requirements.</li>
+                        <li><strong>2. Match/Bid:</strong> Freelancer submits a customized proposal matching the
+                            requirements of the job.</li>
+                        <li><strong>3. Hiring and Escrow:</strong> Client opens proposal comparative workspace, selects
+                            the candidate, and inputs milestones.</li>
+                        <li><strong>4. Messaging Workspace:</strong> The secure chat room opens, enabling AJAX file
+                            attachments and text conversations.</li>
+                        <li><strong>5. Final Payout:</strong> Freelancer submits work, client approves, payment gateway
+                            unlocks, and feedback rating opens.</li>
+                    </ul>
+                    <div class="notes-panel" style="margin-top: 1rem;">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Walk through the user journey. Emphasize that the transition between steps matches database
+                            state machine logic (e.g. from 'Hiring' status to 'In Progress').</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 7: Technical Highlight (Code Improvement) -->
+            <section class="slide" data-slide-id="6" data-title="Code Improvements">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-code-square slide-icon"></i>
+                        <h2 class="slide-title">Technical Improvement Highlight</h2>
+                    </div>
+                    <span class="slide-subtitle">Clean Code</span>
+                </div>
+                <div class="slide-content">
+                    <p class="lead" style="margin-bottom: 0.5rem;">Resolving Inline Template Styling Warning Issues:</p>
+                    <div class="slide-grid-2">
+                        <div>
+                            <h6 style="color: var(--danger); margin-bottom: 0.25rem;">Before (Malformed CSS Lints)</h6>
+                            <pre><span class="highlight-variable">&lt;a</span> <span class="highlight-keyword">style</span>=<span class="highlight-string">"color: {{ '#3b82f6' if m.sender_id != session.user_id else '#58a6ff' }};"</span><span class="highlight-variable">&gt;</span></pre>
+                            <p class="small text-muted mt-2">Putting Jinja conditionals directly inside style
+                                declarations crashes editor validate systems with <code>property value expected</code>.
+                            </p>
+                        </div>
+                        <div>
+                            <h6 style="color: var(--secondary); margin-bottom: 0.25rem;">After (Clean CSS Classes)</h6>
+                            <pre><span class="highlight-variable">&lt;a</span> <span class="highlight-keyword">class</span>=<span class="highlight-string">"chat-attachment-link"</span><span class="highlight-variable">&gt;</span>
+                                
+<span class="highlight-comment">/* main.css */</span>
+.chat-bubble.sent .chat-attachment-link { color: #58a6ff; }
+.chat-bubble.received .chat-attachment-link { color: #3b82f6; }</pre>
+                            <p class="small text-muted mt-2">Style bindings are isolated inside <code>main.css</code>,
+                                keeping HTML templates semantic and readable.</p>
+                        </div>
+                    </div>
+                    <div class="notes-panel" style="margin-top: 1rem;">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>This is a great code design example: instead of mixing server-side template tags inside
+                            client-side inline Stylesheets, we decouple the styles back into the central main.css file.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 8: Security measures -->
+            <section class="slide" data-slide-id="7" data-title="Security Architecture">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-shield-lock-fill slide-icon"></i>
+                        <h2 class="slide-title">System Security Architecture</h2>
+                    </div>
+                    <span class="slide-subtitle">Vulnerability Prevention</span>
+                </div>
+                <div class="slide-content">
+                    <div class="slide-grid-3">
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-key-fill"></i>
+                                <span>Credential Protection</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <strong>Bcrypt Hashing:</strong> Salt-based hashing mechanism ensures logins are immune
+                                to dictionary lookups.
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-file-earmark-lock2-fill"></i>
+                                <span>Upload Sanitization</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <strong>UUID Naming:</strong> Incoming attachment formats are parsed, whitelisted, and
+                                auto-renamed to prevent shell script uploads.
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <i class="bi bi-patch-check-fill"></i>
+                                <span>Payment Verification</span>
+                            </div>
+                            <div class="feature-card-body">
+                                <strong>HMAC Signatures:</strong> Checks transaction parameters against Razorpay order
+                                signatures to prevent client spoofing.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notes-panel">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Demonstrate details of safety implementations. Mention how UUID filenames prevent arbitrary
+                            execution of user-submitted scripts on the host server.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 9: Future Scope -->
+            <section class="slide" data-slide-id="8" data-title="Future Work">
+                <div class="slide-header">
+                    <div class="slide-title-wrapper">
+                        <i class="bi bi-lightbulb-fill slide-icon"></i>
+                        <h2 class="slide-title">Future Scope & Extensions</h2>
+                    </div>
+                    <span class="slide-subtitle">Roadmap</span>
+                </div>
+                <div class="slide-content">
+                    <ul class="points-list">
+                        <li><strong>Escrow Integration:</strong> Hold funds inside a mid-layer security vault until
+                            project tasks match contract quality checks.</li>
+                        <li><strong>AI Skill Matcher:</strong> Feed client posts into semantic models to highlight
+                            optimal candidate profiles.</li>
+                        <li><strong>Video workspaces:</strong> Integrate WebRTC connection tunnels to permit live
+                            meeting discussions.</li>
+                        <li><strong>Centralized Admin Analytics:</strong> Build visual dashboard reporting systems
+                            analyzing fee trends, resolution dispute metrics, and user sign-up counts.</li>
+                    </ul>
+                    <div class="notes-panel">
+                        <h6><i class="bi bi-chat-left-dots-fill"></i> Speaker Notes</h6>
+                        <p>Offer expansion visions: moving from local manual check mechanisms to fully verified trust
+                            layers, dynamic matchmaking, and real-time meeting solutions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 10: Ending slide / demo -->
+            <section class="slide" data-slide-id="9" data-title="Q&A & Demo">
+                <div class="title-slide-layout">
+                    <h1 class="main-gradient-title"><i class="bi bi-chat-left-heart-fill"></i> Thank You!</h1>
+                    <h2 class="title-slide-subtitle"
+                        style="font-size: 1.5rem; margin-top: 1rem; color: var(--secondary)">FreelanceHub: Ready for
+                        Demonstration</h2>
+                    <p class="lead" style="max-width: 600px;">We're open to any questions, feedback, or developer
+                        architecture reviews.</p>
+                    <div class="mt-4"
+                        style="background: rgba(255,255,255,0.02); padding: 1.25rem 2rem; border-radius: 12px; border: 1px solid var(--border);">
+                        <code>Application Host: <a href="http://localhost:5000" target="_blank" style="color: var(--primary-light); text-decoration: underline;">http://localhost:5000</a></code>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Presenter Footer -->
+    <footer class="presenter-controls">
+        <div class="control-btns">
+            <button class="control-btn" id="prevBtn"><i class="bi bi-arrow-left"></i> Previous</button>
+            <button class="control-btn" id="nextBtn">Next <i class="bi bi-arrow-right"></i></button>
+            <button class="control-btn" id="themeToggleBtn"><i class="bi bi-sun-fill" id="themeIcon"></i> Theme</button>
+        </div>
+        <div class="slide-progress" id="slideProgress">
+            Slide 1 of 10
+        </div>
+        <div class="control-btns">
+            <button class="control-btn" id="fullScreenBtn"><i class="bi bi-fullscreen"></i> Fullscreen</button>
+        </div>
+    </footer>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const slideList = document.getElementById('slideList');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const slideProgress = document.getElementById('slideProgress');
+        const fullScreenBtn = document.getElementById('fullScreenBtn');
+        let currentSlide = 0;
+
+        // Initialize presentation list items
+        function initNavBar() {
+            slideList.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const title = slide.dataset.title;
+                const li = document.createElement('li');
+                li.className = `slide-item ${index === currentSlide ? 'active' : ''}`;
+                li.innerHTML = `<i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> ${title}`;
+                li.onclick = () => selectSlide(index);
+                slideList.appendChild(li);
+            });
+        }
+
+        function updateProgress() {
+            slideProgress.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function selectSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+
+            // Update active sidebar selector
+            document.querySelectorAll('.slide-item').forEach((item, idx) => {
+                if (idx === currentSlide) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            updateProgress();
+        }
+
+        // Event Listeners
+        prevBtn.onclick = () => {
+            if (currentSlide > 0) selectSlide(currentSlide - 1);
+        };
+
+        nextBtn.onclick = () => {
+            if (currentSlide < slides.length - 1) selectSlide(currentSlide + 1);
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                if (currentSlide < slides.length - 1) selectSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) selectSlide(currentSlide - 1);
+            }
+        });
+
+        // Theme Toggle
+        themeToggleBtn.onclick = () => {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                themeIcon.className = 'bi bi-moon-fill';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'bi bi-sun-fill';
+            }
+        };
+
+        // Full Screen Toggle
+        fullScreenBtn.onclick = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        };
+
+        // Initialize view
+        initNavBar();
+        updateProgress();
+    </script>
+</body>
+
+</html>
